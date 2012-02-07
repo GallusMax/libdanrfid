@@ -2,7 +2,7 @@ package org.tagsys.LSP2;
 
 import java.util.Date;
 
-import org.rfid.ddm.DDMData;
+import org.rfid.libdanrfid.DDMData;
 
 /**
  * stores Tag Data read from a LSP2 
