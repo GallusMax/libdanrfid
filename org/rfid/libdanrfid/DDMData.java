@@ -17,6 +17,11 @@
 
 package org.rfid.libdanrfid;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 /**
  * A representation of the mandatory fields within the Danish Data Format
  * found on the RFID Tags of some Libraries
@@ -24,7 +29,7 @@ package org.rfid.libdanrfid;
  * @author uhahn
  *
  */
-public class DDMData {
+public class DDMData extends Object{
 	/*
 	 * These presets are used when a blank record is created
 	 * customize here - ugly, too!
@@ -35,12 +40,19 @@ public class DDMData {
 	/* one byte combines Version and media usage 
 	 * this is as ugly a these constants
 	 */
-	public final char V1NEU=16; 
-	public final char V1AUSLEIHBAR=17; 
-	public final char V1PRAESENZ=18; 
-	public final char V1GELOESCHT=23; 
-	public final char V1KUNDE=24; 
+	public static final char V1NEU=16; 		// 0x10
+	public static final char V1AUSLEIHBAR=17; 	// 0x11
+	public static final char V1PRAESENZ=18; 	// 0x12
+	public static final char V1GELOESCHT=23; 
+	public final static char V1KUNDE=24; 
+	public static final char V2NEU=32;
+	public final static String[] TypeName = {"Neu","Ausleihbar","Präsenz","fr13","fr14","fr15","fr16","Gelöscht","Kunde"};
 
+	/*
+	 * TODO this schould be the real block properties from Tag
+	 */
+	protected int blocksize=4;
+	protected int numblocks=8;
 	/*
 	 * some like it forward, some reverse
 	 * still looking for a performant way of handling this
@@ -50,16 +62,87 @@ public class DDMData {
 	protected char[] forward32 = new char[32]; // represents the tag user fields
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
+	protected boolean reversed=false; // remember if we changed the order
+	protected boolean foundCRCok=false;
 	
-	public DDMData(byte[] in){
+	
+	/**
+	 * initialize the 32 byte user data array
+	 * @param in - a byte array as read from
+	 */
+	private void initdata(byte[] in)
+	{
 		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
 			if(i<in.length) // any case..
 				userdata32[i]=(char)in[i];
 			else
 				userdata32[i]=(char)0; // init all
 		}
+		// is this a plausible Record?
+		// nb: reverts the block byte order, if necessary
+		foundCRCok=isvalid();
+		
+	}
+	
+	/**
+	 * constructor based on byte Array
+	 * @param in - an Array of bytes read from tag
+	 */
+	public DDMData(byte[] in){
+		initdata(in);
 	}
 
+	/**
+	 * contruct from a Byte[]
+	 * @param array - the Byte Object array 
+	 * @return 
+	 */
+	public DDMData(Byte[] array) {
+		byte[] ret=new byte[array.length];
+		for(int i=0;i<array.length;i++){
+			ret[i]=array[i].byteValue();
+		}
+		initdata(ret);
+	}
+
+	 /**
+	  * construct from Hex String as produced by toHex()
+	  * @param ins - the HEX string, an optional "0x" prefix will be ignored
+	  */
+	public DDMData(String ins){
+		int startat=0;
+		ins.toLowerCase(); // ignore case
+		if(ins.startsWith("0x")){ // lets believe in HEX
+			startat=2;
+		}
+	
+		String hex=ins.substring(startat); // drop the leading 0x
+		ArrayList<Byte> bal=new ArrayList<Byte>();
+		
+		  //49204c6f7665204a617661 split into two characters 49, 20, 4c...
+		  for( int i=0; i<hex.length()-1; i+=2 ){
+	 
+		      //grab the hex in pairs
+		      String output = hex.substring(i, (i + 2));
+		      //convert hex to decimal
+		      int decimal = Integer.parseInt(output, 16);
+		      //convert the decimal to character
+		      bal.add((byte)decimal);
+		  }
+		  
+	  bal.trimToSize();
+//	  DDMData((Byte[])bal.toArray());
+	  Object[] array= (bal.toArray());
+
+	  // copied helplessly
+		byte[] in=new byte[array.length];
+		for(int i=0;i<array.length;i++){
+			in[i]=((Byte)(array[i])).byteValue();
+		}
+		initdata(in);
+		
+	}
+	
 	/**
 	 * provide an initialized Tag
 	 */
@@ -127,14 +210,19 @@ public class DDMData {
 	
 	/**
 	 * change the order of each block 
+	 * nb: changes order of blocks in place
+	 * property "reversed" keeps track of operations
 	 * FKI writes the blocks from 3 to 0, Biblioteca writes 0 to 3
 	 */
-	protected void reverseblocks(){
+	public void reverseblocks(){ // TODO use actual blocksizes from tag system data
+/*
 		int blocksize=4;
 		int numblocks=8;
+*/
 		for (int k = 0; k < numblocks; k++) { // all blocks
 				reverse(userdata32,k*blocksize,blocksize); // swap string positions
 		}
+		reversed=(reversed?false:true); // toggle reversed marker
 	}
 	
 	/**
@@ -186,6 +274,7 @@ public class DDMData {
 	 */
 	public void setPartNum(int i){
 		userdata32[2]=(char)i;
+		// TODO update "ofParts" in a plausible way
 	}
 	
 	/**
@@ -205,6 +294,15 @@ public class DDMData {
 		return userdata32[0]&0x0f;
 	}
 	
+	/**
+	 * 
+	 * @return the raw byte containing 
+	 * a) nibble VERSION
+	 * b) nibble Tag Usage Code
+	 */
+	public char getcharVersionUsage(){
+		return userdata32[0];
+	}
 	/**
 	 * extract the barcode to a string
 	 * @return
@@ -275,6 +373,7 @@ public class DDMData {
 	public void setISIL(String s){
 		setStringAt(s, 23, 9);
 	}
+	
 	
 	
 }
