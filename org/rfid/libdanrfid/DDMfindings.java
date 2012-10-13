@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class DDMfindings {
 
 	protected DDMData ddd;
+	protected final String TAG="DDMfindigs";
 	
 	
 	protected ArrayList<String> report = new ArrayList<String>() {
@@ -84,6 +85,30 @@ public class DDMfindings {
 	 */
 	public boolean trusted(){
 		return good>threshold;
+	}
+	
+	/**
+	 * this method fixes the byte order if any Danish Data are in sight.
+	 * when a CRC is found, the order is kept. 
+	 * w/o CRC several checks are done and blocks are reverted if necessary.
+	 * @return true, if reverting blocks has occurred
+	 * DDMData.reversed keps track of the byte order
+	 */
+	public boolean reverseOnBestGuess(){
+		if(ddd.isvalid()) // CRC found: ok
+			return false;
+		
+		double goodfw=good;
+		ddd.reverseblocks(); // turn blocks
+		DDMfindings reversefindings=new DDMfindings(ddd);
+		double goodrev=reversefindings.good();
+		
+		if(goodrev>goodfw)
+			return true;
+		else{
+			ddd.reverseblocks(); // return to forward
+			return false;
+		}
 	}
 	
 	
