@@ -209,6 +209,33 @@ public class DDMData extends Object{
 	}
 	
 	/**
+	 * prepare single blocks for writing
+	 * @param n - the block wanted 
+	 * @return a byte array with the block 
+	 * TODO : with respect to ordering? ;-)
+	 */
+	
+	public byte[] getblock(int n){
+		return getblock(n,4); // default to blocksize 4
+	}
+
+	/**
+	 * prepare single blocks for writing
+	 * @param n - the block wanted 
+	 * @param blocksize - respect tag's blocksize
+	 * @return a byte array with the block 
+	 * TODO : with respect to ordering? ;-)
+	 */
+	
+	public byte[] getblock(int n, int blocksize){
+		byte[] res= new byte[blocksize];
+		
+		for(int i=0;i<blocksize;i++)
+			res[i]=(byte)userdata32[n*blocksize+i];
+		return res;
+	}
+	
+	/**
 	 * change the order of each block 
 	 * nb: changes order of blocks in place
 	 * property "reversed" keeps track of operations
