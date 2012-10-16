@@ -46,7 +46,7 @@ public class DDMData extends Object{
 	public static final char V1GELOESCHT=23; 
 	public final static char V1KUNDE=24; 
 	public static final char V2NEU=32;
-	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","invalid 0x13","invalid 0x14","invalid 0x15","invalid 0x16","Gelöscht","Kunde"};
+	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","invalid 0x13","invalid 0x14","invalid 0x15","invalid 0x16","Gelöscht","Kundenkarte"};
 
 	/*
 	 * TODO this schould be the real block properties from Tag
