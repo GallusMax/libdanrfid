@@ -62,6 +62,7 @@ public class DDMData extends Object{
 	protected char[] forward32 = new char[32]; // represents the tag user fields
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
+	protected char[] shadowdata; // keep array as initialized for change tracking
 	protected boolean reversed=false; // remember if we changed the order
 	protected boolean foundCRCok=false;
 	
@@ -82,6 +83,19 @@ public class DDMData extends Object{
 		// nb: reverts the block byte order, if necessary
 		foundCRCok=isvalid();
 		
+		resetshadowdata();
+	}
+	
+	public void resetshadowdata(){
+		shadowdata=userdata32.clone();
+	}
+	/**
+	 * compares single bytes between current array and original array
+	 * @param i
+	 * @return true if byte i was changed
+	 */
+	public boolean bytetainted(int i){
+		return userdata32[i]!=shadowdata[i];
 	}
 	
 	/**
@@ -224,15 +238,31 @@ public class DDMData extends Object{
 	 * @param n - the block wanted 
 	 * @param blocksize - respect tag's blocksize
 	 * @return a byte array with the block 
-	 * TODO : with respect to ordering? ;-)
+	 * TODO : respect to ordering by parameter ?! ;-)
 	 */
 	
 	public byte[] getblock(int n, int blocksize){
 		byte[] res= new byte[blocksize];
 		
 		for(int i=0;i<blocksize;i++)
-			res[i]=(byte)userdata32[n*blocksize+i];
+			res[i]=(byte)(reversed ? userdata32[(n+1)*blocksize-i-1] : userdata32[n*blocksize+i]);
 		return res;
+	}
+	
+	public boolean blocktainted(int n){
+		return blocktainted(n,4);
+	}
+	
+	/**
+	 * find out if our updates have changed this block
+	 * @param n
+	 * @param blocksize
+	 * @return true, if block needs to be written back to tag
+	 */
+	public boolean blocktainted(int n, int blocksize){
+		for(int i=0;i<blocksize;i++)
+			if(bytetainted(n*blocksize+i)) return true;
+		return false;
 	}
 	
 	/**
