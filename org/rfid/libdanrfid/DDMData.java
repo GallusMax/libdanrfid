@@ -43,16 +43,21 @@ public class DDMData extends Object{
 	public static final char V1NEU=16; 		// 0x10
 	public static final char V1AUSLEIHBAR=17; 	// 0x11
 	public static final char V1PRAESENZ=18; 	// 0x12
+	public static final char V1LOCAL3=19; 	// 0x13 "ISO_FDIS_28560-3"
+	public static final char V1LOCAL4=20; 	// 0x14
+	public static final char V1FUTURE=21; 	// 0x15
+	public static final char V1UNKNOWN=22; 	// 0x16
 	public static final char V1GELOESCHT=23; 
 	public final static char V1KUNDE=24; 
+	public final static char V1EQUIPMENT=25; // 0x19
 	public static final char V2NEU=32;
-	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","invalid 0x13","invalid 0x14","invalid 0x15","invalid 0x16","Gelöscht","Kundenkarte"};
+	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","local 0x13","local 0x14","future 0x15","Unbekannt","Gelöscht","Kundenkarte","Gerät"};
 
 	/*
 	 * TODO this schould be the real block properties from Tag
 	 */
 	protected int blocksize=4;
-	protected int numblocks=8;
+	protected int nBlocks=8;
 	/*
 	 * some like it forward, some reverse
 	 * still looking for a performant way of handling this
@@ -71,7 +76,7 @@ public class DDMData extends Object{
 	 * initialize the 32 byte user data array
 	 * @param in - a byte array as read from
 	 */
-	private void initdata(byte[] in)
+	protected void initdata(byte[] in)
 	{
 		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
 			if(i<in.length) // any case..
@@ -79,35 +84,41 @@ public class DDMData extends Object{
 			else
 				userdata32[i]=(char)0; // init all
 		}
-		// is this a plausible Record?
+		// is this a crc ok Record?
 		// nb: reverts the block byte order, if necessary
 		foundCRCok=isvalid();
 		
-		resetshadowdata();
+		keepshadowdata(); // keep this state in order to track the changes		
 	}
 	
-	public void resetshadowdata(){
+	private void keepshadowdata(){
 		shadowdata=userdata32.clone();
+		for(int i=0;i<userdata32.length;i++)
+			shadowdata[i]=(char)(userdata32[i]&0xff); // chars may have a sign?
 	}
 	/**
-	 * compares single bytes between current array and original array
+	 * compares a single byte between current array and original array
 	 * @param i
 	 * @return true if byte i was changed
 	 */
 	public boolean bytetainted(int i){
-		return userdata32[i]!=shadowdata[i];
+		boolean istainted = userdata32[i]!=shadowdata[i];
+		if(istainted)
+			return istainted;
+		else
+			return istainted;
 	}
 	
 	/**
-	 * constructor based on byte Array
-	 * @param in - an Array of bytes read from tag
+	 * constructor from byte[] Array
+	 * @param in - userdata as bytes read from tag
 	 */
 	public DDMData(byte[] in){
 		initdata(in);
 	}
 
 	/**
-	 * contruct from a Byte[]
+	 * constructor from Byte[]
 	 * @param array - the Byte Object array 
 	 * @return 
 	 */
@@ -120,8 +131,8 @@ public class DDMData extends Object{
 	}
 
 	 /**
-	  * construct from Hex String as produced by toHex()
-	  * @param ins - the HEX string, an optional "0x" prefix will be ignored
+	  * constructor from Hex String as from toString()
+	  * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
 	  */
 	public DDMData(String ins){
 		int startat=0;
@@ -159,8 +170,11 @@ public class DDMData extends Object{
 	
 	/**
 	 * provide an initialized Tag
+	 * - single Medium
+	 * - County and ISIL initialized with default values (hard coded)
 	 */
 	public DDMData(){
+		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
 		setUsage(V1AUSLEIHBAR);
 		setofParts(1);
 		setPartNum(1);
@@ -230,22 +244,27 @@ public class DDMData extends Object{
 	 */
 	
 	public byte[] getblock(int n){
-		return getblock(n,4); // default to blocksize 4
+		return getblock(n,4,false); // default to blocksize 4
+	}
+
+	public byte[] getblock(int n, boolean forcereverse){
+		return getblock(n,4,forcereverse); // default to blocksize 4
 	}
 
 	/**
 	 * prepare single blocks for writing
+	 * byteorder is reversed, if found reversed during read
 	 * @param n - the block wanted 
 	 * @param blocksize - respect tag's blocksize
+	 * @param forcereverse requests reverted blocks
 	 * @return a byte array with the block 
-	 * TODO : respect to ordering by parameter ?! ;-)
 	 */
 	
-	public byte[] getblock(int n, int blocksize){
+	public byte[] getblock(int n, int blocksize, boolean forcereverse){
 		byte[] res= new byte[blocksize];
 		
 		for(int i=0;i<blocksize;i++)
-			res[i]=(byte)(reversed ? userdata32[(n+1)*blocksize-i-1] : userdata32[n*blocksize+i]);
+			res[i]=(byte)((reversed||forcereverse) ? userdata32[(n+1)*blocksize-i-1] : userdata32[n*blocksize+i]);
 		return res;
 	}
 	
@@ -254,14 +273,15 @@ public class DDMData extends Object{
 	}
 	
 	/**
-	 * find out if our updates have changed this block
+	 * find out if our updates have changed block n
 	 * @param n
 	 * @param blocksize
-	 * @return true, if block needs to be written back to tag
+	 * @return true, meaning block needs to be written back to tag
 	 */
 	public boolean blocktainted(int n, int blocksize){
 		for(int i=0;i<blocksize;i++)
-			if(bytetainted(n*blocksize+i)) return true;
+			if(bytetainted(n*blocksize+i)) 
+				return true;
 		return false;
 	}
 	
@@ -276,7 +296,7 @@ public class DDMData extends Object{
 		int blocksize=4;
 		int numblocks=8;
 */
-		for (int k = 0; k < numblocks; k++) { // all blocks
+		for (int k = 0; k < nBlocks; k++) { // all blocks
 				reverse(userdata32,k*blocksize,blocksize); // swap string positions
 		}
 		reversed=(reversed?false:true); // toggle reversed marker
