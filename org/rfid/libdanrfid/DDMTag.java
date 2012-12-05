@@ -16,7 +16,7 @@ public class DDMTag extends DDMData {
 	
 	public void setAFI(byte AFI){
 		this.afi=AFI;
-		isTainted=true;
+//		isTainted=true;
 		afiTainted=true;
 	}
 
@@ -29,13 +29,18 @@ public class DDMTag extends DDMData {
 	}
 	
 	public byte[] addSystemInformation(String s){
+		//TODO - skip first 0x00 byte from Android NfcV
+		if(s.startsWith("0x")) // rip off the leading 0x byte from hex String
+			s=s.substring(2);
+		if(s.startsWith("000")) // rip off the leading 00 byte from NfcV..
+			s=s.substring(2);
 		return addSystemInformation(Util.hexStringToByteArray(s));
 	}
 
 	public byte[] addSystemInformation(byte[] read){
 //		byte[] read=transceive((byte)0x2b);
 		sysinfo=read;
-//		if(0==read[0]){// no error
+//		if(0==read[0]){// no error byte from Android NfcV
 //			String s=new String(read);
 			//s.substring(2, 9).compareTo(Id.toString())  // the same?
 			char flags=(char)read[0]; //s.charAt(1);
@@ -85,5 +90,5 @@ public class DDMTag extends DDMData {
 //		super();
 		// TODO Auto-generated constructor stub
 	}
-
+	
 }

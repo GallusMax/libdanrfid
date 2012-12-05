@@ -16,6 +16,12 @@ public class Util {
         return text;
     }
     
+	/**
+	 * interpret a string of hex numbers as bytes
+	 * TODO: error checking, leading 0x to be skipped?
+	 * @param s - the string of hex digit pairs
+	 * @return - an array of bytes
+	 */
     public static byte[] hexStringToByteArray(String s) {
     	//TODO what if null==s?
     	int len = s.length();

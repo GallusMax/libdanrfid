@@ -53,11 +53,15 @@ public class DDMData extends Object{
 	public static final char V2NEU=32;
 	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","local 0x13","local 0x14","future 0x15","Unbekannt","Gelöscht","Kundenkarte","Gerät"};
 
+//	public final static Hash<char,String> HStatus=new Hash<char,String>{};
+	
 	/*
 	 * TODO this schould be the real block properties from Tag
 	 */
 	protected int blocksize=4;
-	protected int nBlocks=8;
+	protected int nBlocks=8; // number of blocks on tag - not the DDM size!
+	protected int nDDMblocks=8; // fits into userdata32..
+	
 	/*
 	 * some like it forward, some reverse
 	 * still looking for a performant way of handling this
@@ -68,8 +72,19 @@ public class DDMData extends Object{
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
 	protected char[] shadowdata; // keep array as initialized for change tracking
-	protected boolean reversed=false; // remember if we changed the order
+	/**
+	 * remember if we found reverted byteorder on tag
+	 */
+	 protected boolean reversed=false;  
+	
+	 /**
+	  * remember if the tag had a valid CRC weh we read it
+	  */
 	protected boolean foundCRCok=false;
+	/**
+	 * the DDM data format version, used on status updates
+	 */
+	private char VERSION=1;
 	
 	
 	/**
@@ -142,6 +157,9 @@ public class DDMData extends Object{
 		}
 	
 		String hex=ins.substring(startat); // drop the leading 0x
+		
+		initdata(Util.hexStringToByteArray(hex));
+/*		
 		ArrayList<Byte> bal=new ArrayList<Byte>();
 		
 		  //49204c6f7665204a617661 split into two characters 49, 20, 4c...
@@ -165,7 +183,7 @@ public class DDMData extends Object{
 			in[i]=((Byte)(array[i])).byteValue();
 		}
 		initdata(in);
-		
+*/	
 	}
 	
 	/**
@@ -237,29 +255,35 @@ public class DDMData extends Object{
 	}
 	
 	/**
-	 * prepare single blocks for writing
-	 * @param n - the block wanted 
+	 * prepare single block for writing.
+	 * byteorder remains reversed, if found reversed during read
+	 * @param n - the block index
 	 * @return a byte array with the block 
 	 * TODO : with respect to ordering? ;-)
 	 */
-	
 	public byte[] getblock(int n){
 		return getblock(n,4,false); // default to blocksize 4
 	}
 
+	/**
+	 * prepare single block for writing.
+	 * byteorder remains reversed, if found reversed during read
+	 * @param n - the block index 
+	 * @param forcereverse requests reverted byteorder (on empty tags)
+	 * @return a byte array with the block 
+	 */
 	public byte[] getblock(int n, boolean forcereverse){
 		return getblock(n,4,forcereverse); // default to blocksize 4
 	}
 
 	/**
-	 * prepare single blocks for writing
-	 * byteorder is reversed, if found reversed during read
-	 * @param n - the block wanted 
+	 * prepare single block for writing.
+	 * byteorder remains reversed, if found reversed during read
+	 * @param n - the block index 
 	 * @param blocksize - respect tag's blocksize
-	 * @param forcereverse requests reverted blocks
+	 * @param forcereverse requests reverted byteorder (on empty tags)
 	 * @return a byte array with the block 
 	 */
-	
 	public byte[] getblock(int n, int blocksize, boolean forcereverse){
 		byte[] res= new byte[blocksize];
 		
@@ -268,6 +292,11 @@ public class DDMData extends Object{
 		return res;
 	}
 	
+	/**
+	 * find out if our updates have changed block n
+	 * @param n
+	 * @return true if block needs to be written back to tag
+	 */
 	public boolean blocktainted(int n){
 		return blocktainted(n,4);
 	}
@@ -276,7 +305,7 @@ public class DDMData extends Object{
 	 * find out if our updates have changed block n
 	 * @param n
 	 * @param blocksize
-	 * @return true, meaning block needs to be written back to tag
+	 * @return true if block needs to be written back to tag
 	 */
 	public boolean blocktainted(int n, int blocksize){
 		for(int i=0;i<blocksize;i++)
@@ -296,7 +325,7 @@ public class DDMData extends Object{
 		int blocksize=4;
 		int numblocks=8;
 */
-		for (int k = 0; k < nBlocks; k++) { // all blocks
+		for (int k = 0; k < nDDMblocks; k++) { // all blocks
 				reverse(userdata32,k*blocksize,blocksize); // swap string positions
 		}
 		reversed=(reversed?false:true); // toggle reversed marker
@@ -355,22 +384,34 @@ public class DDMData extends Object{
 	}
 	
 	/**
-	 * change the usage 
-	 * @param usage
-	 * n.b.: the version is included here
+	 * change the usage (aka media status)
+	 * @param usage - either the usage char or the usage nibble alone
+	 * n.b.: the version is set to default version, if usage value < 0x10 
+	 * TODO: this currently doesnt work on Bibliotheca
 	 */
 	public void setUsage(char usage){
-		userdata32[0]=usage;
+		userdata32[0]=(char) ((0<(usage&0xf0)) ? usage : usage&(VERSION<<4));
 	}
 
 	/**
-	 * 
-	 * @return the usage nibble
+	 * aka media status nibble
+	 * TODO this will currently (silently) fail on Bibliotheca (and other?) tags,
+	 * as have another nibble order. silently means the version nibble (currently 1) 
+	 * is returned as the most common media status "Ausleihbar"
+	 * @return the usage nibble - without the version!
 	 */
 	public int getUsage(){
 		return userdata32[0]&0x0f;
 	}
 	
+	/**
+	 * 
+	 * @return the media status in a readable form
+	 * TODO localization per platform?
+	 */
+	public String getUsageAsString(){
+		return TypeName[getUsage()];
+	}
 	/**
 	 * 
 	 * @return the raw byte containing 
@@ -379,6 +420,9 @@ public class DDMData extends Object{
 	 */
 	public char getcharVersionUsage(){
 		return userdata32[0];
+	}
+	public byte getVersionUsage(){
+		return (byte)(userdata32[0]&0xff);
 	}
 	/**
 	 * extract the barcode to a string
@@ -392,6 +436,18 @@ public class DDMData extends Object{
 		else
 			return res;
 	}
+	
+	/**
+	 * does this Itemcode belong to us? 
+	 * @param barcodePattern - the pattern to be checked against
+	 * @return - true if matches, or null or empty Pattern given
+	 */
+	public boolean barcodematch(String barcodePattern){
+		if(null==barcodePattern)return true;
+		if(barcodePattern.isEmpty()) return true;
+		return Barcode().matches(barcodePattern);
+	}
+
 	
 	/**
 	 * put String @param s at postition @param start
@@ -451,6 +507,22 @@ public class DDMData extends Object{
 		setStringAt(s, 23, 9);
 	}
 	
+	/**
+	 * 
+	 * @return the blocksize according to Tag system info
+	 */
+	public int getblocksize(){
+		return (int)blocksize;
+	}
 	
+	/**
+	 * 
+	 * @return the number of blocks on the Tag
+	 */
+	public int getnBlocks(){
+		return (int)nBlocks;
+	}
+	
+
 	
 }
