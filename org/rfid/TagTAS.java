@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 //import org.android.nfc.tech.Util;
 
@@ -13,6 +14,7 @@ public class TagTAS implements Runnable{
 	protected static boolean urlValid=false;
 	private String UID=null;
 	private String barcode=null;
+	private String userdata=null;
 	
 	/**
 	 * prepares a connect to the given URL
@@ -52,6 +54,10 @@ public class TagTAS implements Runnable{
 		this.UID=UID;
 		this.barcode=bar;
 	}
+	
+	public void addUserData(String in){
+		userdata=in;
+	}
 
 	@Override
 	public void run() {
@@ -59,9 +65,12 @@ public class TagTAS implements Runnable{
 			barcode(UID);
 		else
 			updatebarcode(UID, barcode);
+		if(null!=userdata){ // we have additional data
+			updateudat(UID,userdata);
+		}
 	}
 
-	
+
 	/**
 	 * fetches the barcode from the db - this may take some time
 	 * @param UID - the tag UID. Ordering will be guessed from "e004" beginning
@@ -89,7 +98,7 @@ public class TagTAS implements Runnable{
 	 */
 	public String updatebarcode(String UID, String barcode){
 		try {
-			return dorequest(strbaseUrlTas + "?id=" + UID + "&bar=" + barcode);
+			return dorequest(strbaseUrlTas + "?id=" + UID + "&bar=" + URLEncoder.encode(barcode));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,11 +106,29 @@ public class TagTAS implements Runnable{
 		
 		return "update failed";
 	}
+
+	/**
+	 * updates the userdata on the db - this may take some time
+	 * @param UID - the tag UID. Ordering will be guessed from "e004" beginning
+	 * @param udat - the raw userdata from tag
+	 * @return - the barcode from db, if any. 
+	 * TODO what about caching?
+	 */
+	public String updateudat(String UID, String udat){
+		try {
+			return dorequest(strbaseUrlTas + "?id=" + UID + "&udat=" + URLEncoder.encode(udat));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "update udat failed";
+	}
 	
 	protected String dorequest(String urlquery) throws IOException{
 		String strResult="";
 		URL CgiUrlTas;
-		
+//		System.err.println("dorequest: "+urlquery);
 		try {
 			CgiUrlTas = new URL(urlquery); // TODO unchecked?
 			InputStream is = (InputStream)CgiUrlTas.getContent();
