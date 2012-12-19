@@ -122,13 +122,13 @@ public class DDMfindings {
 	}
 
 	private void checkReverse(){
-		if(ddd.reversed) report.add("revertierte Blöcke");
+		if(ddd.reversed) report.add("revertierte Blöcke (FKI?)");
 		
 	}
 	
 	private double checkISIL(){
 		double v=1;
-		if(!ddd.Country().startsWith(" ")
+		if(!ddd.Country().isEmpty()
 			&& ddd.ISIL().startsWith(ddd.Country())) 
 			report.add(ddd.Country()+" in ISIL wiederholt");
 		if(!ddd.Country().matches("[A-Z]+")){
@@ -159,6 +159,8 @@ public class DDMfindings {
 				case DDMData.V1KUNDE: break;
 				case DDMData.V1NEU: break;
 				case DDMData.V1PRAESENZ: break;
+				case DDMData.BIBLIOTHECA_PRAESENZ: report.add("PRAESENZ Byte (Bibliotheca?)");
+				case DDMData.BIBLIOTHECA_GELOESCHT: report.add("GELOESCHT Byte (Bibliotheca?)");
 				default: report.add(String.format("Typfeld unbekannt: 0x%h",ddd.getcharVersionUsage()));
 						v=0.5;
 		}

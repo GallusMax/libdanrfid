@@ -49,8 +49,11 @@ public class DDMData extends Object{
 	public static final char V1UNKNOWN=22; 	// 0x16
 	public static final char V1GELOESCHT=23; 
 	public final static char V1KUNDE=24; 
-	public final static char V1EQUIPMENT=25; // 0x19
-	public static final char V2NEU=32;
+	public final static char V1EQUIPMENT=0x19; // 0x19
+	public static final char V2NEU=0x20;
+	public static final char V2AUSLEIHBAR=0x21;
+	public static final char BIBLIOTHECA_PRAESENZ=0x21;
+	public static final char BIBLIOTHECA_GELOESCHT=0x71;
 	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","local 0x13","local 0x14","future 0x15","Unbekannt","Gelöscht","Kundenkarte","Gerät"};
 
 //	public final static Hash<char,String> HStatus=new Hash<char,String>{};
