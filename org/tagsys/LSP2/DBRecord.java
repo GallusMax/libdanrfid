@@ -21,9 +21,6 @@ public class DBRecord extends DDMData {
 			read[i]=(char)in[i];
 		}
 		filltag();
-		for (char d : userdata32) {
-			System.out.format("%02x", (byte)d);			
-		}
 
 	}
 	
