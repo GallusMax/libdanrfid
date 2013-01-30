@@ -413,7 +413,13 @@ public class DDMData extends Object{
 	 * TODO localization per platform?
 	 */
 	public String getUsageAsString(){
-		return TypeName[getUsage()];
+		String res=String.format("0x%x", getUsage());
+		try{
+			res = TypeName[getUsage()];
+		}
+		catch (IndexOutOfBoundsException e){
+		}
+		return res;
 	}
 	/**
 	 * 

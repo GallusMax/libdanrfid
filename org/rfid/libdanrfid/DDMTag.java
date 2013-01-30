@@ -34,7 +34,10 @@ public class DDMTag extends DDMData {
 			s=s.substring(2);
 		if(s.startsWith("000")) // rip off the leading 00 byte from NfcV..
 			s=s.substring(2);
-		return addSystemInformation(Util.hexStringToByteArray(s));
+		if((16==s.length() && (s.toUpperCase().startsWith("E004")))){ // we have just an UID here
+			return null;
+		}else
+			return addSystemInformation(Util.hexStringToByteArray(s));
 	}
 
 	public byte[] addSystemInformation(byte[] read){
