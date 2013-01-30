@@ -17,11 +17,6 @@
 
 package org.rfid.libdanrfid;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 /**
  * A representation of the mandatory fields within the Danish Data Format
  * found on the RFID Tags of some Libraries
@@ -35,7 +30,7 @@ public class DDMData extends Object{
 	 * customize here - ugly, too!
 	 */
 	public final String myCountry="DE";
-	public final String myISIL="0705";
+	public final String myISIL="705";
 	
 	/* one byte combines Version and media usage 
 	 * this is as ugly a these constants
@@ -89,6 +84,30 @@ public class DDMData extends Object{
 	 */
 	private char VERSION=1;
 	
+	/**
+	 * @param args
+	 * usage: $0 <barcode> [more args?]
+	 * prints out the 32 byte Tag user data 
+	 * complete with CRC according Daenisches Datenmodell
+	 */
+	public static void main(String[] args) {
+
+		if(0==args.length){
+			usage();
+			return;
+		}
+		
+		DDMData td=new DDMData();
+		td.setBarcode(args[0]);
+		System.out.format("%s", td.toString());
+		
+	}
+	
+	public static void usage(){
+		System.out.format("usage: $0 <barcode>\n");
+		System.out.format("will return the 32 byte userdata of a RFID Tag\n");
+	}
+
 	
 	/**
 	 * initialize the 32 byte user data array
