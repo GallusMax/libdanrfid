@@ -3,7 +3,7 @@ package org.rfid.libdanrfid;
 public class DDMTag extends DDMData {
 
 	public static final byte AFI_ON=0x07;
-	public static final byte AFI_OFF=0x21;
+	public static final byte AFI_OFF=0xC2;
 
 	private byte afi=0;
 	public boolean isTainted=true; // we have not read all - or have made changes yet unwritten
