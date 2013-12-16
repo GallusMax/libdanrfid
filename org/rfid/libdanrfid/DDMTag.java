@@ -23,6 +23,13 @@ public class DDMTag extends DDMData {
 	public boolean isAFIsecured(){
 		return (AFI_ON==afi);
 	}
+	/**
+	 * 
+	 * @return 8 bytes UID from Tag's sysinfo as Hex in uppercase. e.g. "E004010031323334"
+	 */
+	public String getUID(){
+		return Util.reverseHex(Util.toHex(sysinfo).substring(2,18).toUpperCase()); 
+	}
 	
 	public void addUserData(byte[] in){
 		initdata(in);
