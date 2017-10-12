@@ -5,3 +5,5 @@
 ### Whats the goal?
 
 This library shall provide a reference implementation dealing with the different implementations of the Danish Data Model. While providing a quite strict definition, tags often cannot be interchanged between institutions. If there were a reference implementation, vendors could easily check compliance of their model against it.
+
+read more in the Wiki
