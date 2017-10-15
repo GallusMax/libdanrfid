@@ -74,7 +74,7 @@ public class LSP2{
 		lastcount=count;
 		status=String.format("(getcounter: %d) ", count);
 		}else{
-		status="(getcounter: null result) ";
+		//status="(getcounter: null result) ";
 		}
 		return count;
 		
@@ -213,7 +213,7 @@ public class LSP2{
 			inStream.read(result, 0, 2);
 			if ((command[0]==result[0]) && (command[1]==result[1])){  // echoed my command OK
 				announcedlength=inStream.read();	
-				System.err.format("announcedlength-here %d bytes\n", announcedlength);
+//				System.err.format("announcedlength-here %d bytes\n", announcedlength);
 			};
 		
 		// get data
@@ -222,6 +222,10 @@ public class LSP2{
 				readlength+=inStream.read(result,readlength,announcedlength-readlength);
 //				System.err.format("read %d bytes so far\n", readlength);
 			}
+//			return result;
+		}
+		catch(ConnectException e){
+			status=e.toString();
 		}
 		catch(IOException e){
 			//TODO gib Laut
@@ -231,7 +235,7 @@ public class LSP2{
 		}
 //		close(); // closed on timeout if we forget here
 
-		return result;
+		return result; 
 	}
 	
 	private void close() {
@@ -302,11 +306,16 @@ public class LSP2{
 				return false;
 			}
 		}
+		catch(ConnectException e){
+			triesleft=0;
+			status= String.format("conn failed: %s", e.toString());
+			return false;
+		}
 		catch(IOException e){
 			triesleft--;
 			System.err.printf("%d tries left: %s",triesleft,e.toString());
 //			System.err.print(e.toString());
-			e.printStackTrace();
+//			e.printStackTrace();
 			
 			if(triesleft<=0){
 				status= String.format("conn failed: %s", e.toString());
