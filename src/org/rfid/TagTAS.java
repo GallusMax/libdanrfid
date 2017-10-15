@@ -36,7 +36,8 @@ public class TagTAS implements Runnable{
 
 	public TagTAS(){
 		this("http://yourserver.home.at/cgi-bin/tagtas.cgi"); 
-		/* answers with string <UIDhex>:<barcode> on CGI parameters
+		/* answers with string UID:<UIDhex>:<barcode> 
+		 * on CGI parameters:
 		 * id=<the tag UID in hex>
 		 * bar=<the new barcode> - optional, if an update is wanted
 		 */
@@ -74,7 +75,7 @@ public class TagTAS implements Runnable{
 	/**
 	 * fetches the barcode from the db - this may take some time
 	 * @param UID - the tag UID. Ordering will be guessed from "e004" beginning
-	 * @return - the OLD barcode, if any. remember: the NEW barcode will be added to the db
+	 * @return - the OLD barcode, if any. 
 	 * TODO what about caching?
 	 */
 	public String barcode(String UID){
@@ -86,7 +87,7 @@ public class TagTAS implements Runnable{
 			e.printStackTrace();
 		}
 //TODO valid error reply		
-		return "request failed";
+		return "error-request failed";
 	}
 	
 	/**
@@ -98,13 +99,13 @@ public class TagTAS implements Runnable{
 	 */
 	public String updatebarcode(String UID, String barcode){
 		try {
-			return dorequest(strbaseUrlTas + "?id=" + UID + "&bar=" + URLEncoder.encode(barcode));
+			return dorequest(strbaseUrlTas + "?id=" + UID + "&bar=" + URLEncoder.encode(barcode,"UTF-8"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return "update failed";
+		return "error-update failed";
 	}
 
 	/**
@@ -116,13 +117,13 @@ public class TagTAS implements Runnable{
 	 */
 	public String updateudat(String UID, String udat){
 		try {
-			return dorequest(strbaseUrlTas + "?id=" + UID + "&udat=" + URLEncoder.encode(udat));
+			return dorequest(strbaseUrlTas + "?id=" + UID + "&udat=" + URLEncoder.encode(udat,"UTF-8"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return "update udat failed";
+		return "error-update udat failed";
 	}
 	
 	protected String dorequest(String urlquery) throws IOException{
@@ -145,6 +146,7 @@ public class TagTAS implements Runnable{
 		catch (MalformedURLException mue) {
 			// TODO Auto-generated catch block
 			mue.printStackTrace();
+			strResult="error-invalid URL";
 		}
 		return strResult;
 	}
