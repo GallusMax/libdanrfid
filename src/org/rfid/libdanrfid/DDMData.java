@@ -561,6 +561,10 @@ public class DDMData extends Object{
 	public int getnBlocks(){
 		return (int)nBlocks;
 	}
+
+	public void addUserData(byte[] in) {
+		initdata(in);
+	}
 	
 
 	

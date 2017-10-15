@@ -2,8 +2,10 @@ package org.rfid.libdanrfid;
 
 public class DDMTag extends DDMData {
 
-	public static final byte AFI_ON=(byte)0x07;
-	public static final byte AFI_OFF=(byte)0xC2;
+	public static final byte AFI_ON=0x07;
+	public static final byte AFI_OFF=0x21; // TODO make AFI values configurable in java properties
+	private static final String SysDummyHex="0355443322110004E00007";
+	private static final String SysDummyUnlockHex="0355443322110004E00021";
 
 	private byte afi=0;
 	public boolean isTainted=true; // we have not read all - or have made changes yet unwritten
@@ -29,10 +31,6 @@ public class DDMTag extends DDMData {
 	 */
 	public String getUID(){
 		return Util.reverseHex(Util.toHex(sysinfo).substring(2,18).toUpperCase()); 
-	}
-	
-	public void addUserData(byte[] in){
-		initdata(in);
 	}
 	
 	public byte[] addSystemInformation(String s){
@@ -72,7 +70,11 @@ public class DDMTag extends DDMData {
 //		return new byte[]{};
 	}
 
-	public String toString(){
+	/**
+	 * 
+	 * @return a line formatted for the list window
+	 */
+	public String toDisplayLine(){
 		StringBuilder res=new StringBuilder(Barcode());
 		if(1<getofParts())
 			res.append(" "+getPartNum()+"/"+getofParts());
@@ -81,8 +83,8 @@ public class DDMTag extends DDMData {
 		return (res.toString());
 	}
 	
-	public DDMTag(byte[] in) {
-		super(in);
+	public DDMTag(byte[] userdata) {
+		super(userdata);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -91,13 +93,17 @@ public class DDMTag extends DDMData {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DDMTag(String ins) {
-		super(ins);
-		// TODO Auto-generated constructor stub
+	public DDMTag(String hexstring) {
+		super(hexstring);
 	}
 
+	/**
+	 * this constructor currently creates a pure dummy tag, 
+	 * locked and with an obviously bogus UID
+	 */
 	public DDMTag() {
-//		super();
+		super();
+		addSystemInformation(SysDummyHex);
 		// TODO Auto-generated constructor stub
 	}
 	
