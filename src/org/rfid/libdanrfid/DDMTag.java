@@ -3,7 +3,7 @@ package org.rfid.libdanrfid;
 public class DDMTag extends DDMData {
 
 	public static final byte AFI_ON=0x07;
-	public static final byte AFI_OFF=0x21; // TODO make AFI values configurable in java properties
+	public static final byte AFI_OFF=0x21; // TODO make AFI values configurable in java properties?
 	private static final String SysDummyHex="0355443322110004E00007";
 	private static final String SysDummyUnlockHex="0355443322110004E00021";
 
