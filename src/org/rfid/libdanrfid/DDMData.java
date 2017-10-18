@@ -36,15 +36,25 @@ public class DDMData extends Object{
 	 * this is as ugly a these constants
 	 */
 	public static final char V1NEU=16; 		// 0x10
+	public static final int USAGE_NEU=0; 		// the usage nibble (the low for FKI, the high for bibliotheca) 
 	public static final char V1AUSLEIHBAR=17; 	// 0x11
+	public static final int USAGE_AUSLEIHBAR=1; 
 	public static final char V1PRAESENZ=18; 	// 0x12
+	public static final int USAGE_PRAESENZ=2; 	// 0x12
 	public static final char V1LOCAL3=19; 	// 0x13 "ISO_FDIS_28560-3"
+	public static final int USAGE_3=3; 		// 0x13 "ISO_FDIS_28560-3"
 	public static final char V1LOCAL4=20; 	// 0x14
+	public static final int	USAGE_4=4; 		// 0x14
 	public static final char V1FUTURE=21; 	// 0x15
+	public static final int	USAGE_5=5; 		// 0x15
 	public static final char V1UNKNOWN=22; 	// 0x16
-	public static final char V1GELOESCHT=23; 
-	public final static char V1KUNDE=24; 
-	public final static char V1EQUIPMENT=0x19; // 0x19
+	public static final int	USAGE_6=6; 		// 0x16
+	public static final char V1GELOESCHT=23;  	// 0x17
+	public static final int	USAGE_GELOESCHT=7; 	// 0x17
+	public static final char V1KUNDE=24; 	// 0x18
+	public static final int	USAGE_KUNDE=8; 	// 0x18
+	public static final char V1EQUIPMENT=0x19; // 0x19
+	public static final int	USAGE_EQUIPMENT=9; // 0x19
 	public static final char V2NEU=0x20;
 	public static final char V2AUSLEIHBAR=0x21;
 	public static final char BIBLIOTHECA_PRAESENZ=0x21;
@@ -421,6 +431,7 @@ public class DDMData extends Object{
 	 * as have another nibble order. silently means the version nibble (currently 1) 
 	 * is returned as the most common media status "Ausleihbar"
 	 * @return the usage nibble - without the version!
+	 * compare the result with final int values USAGE_..
 	 */
 	public int getUsage(){
 		return userdata32[0]&0x0f;
@@ -549,6 +560,10 @@ public class DDMData extends Object{
 	 */
 	public int getnBlocks(){
 		return (int)nBlocks;
+	}
+
+	public void addUserData(byte[] in) {
+		initdata(in);
 	}
 	
 

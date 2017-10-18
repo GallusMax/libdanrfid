@@ -2,8 +2,10 @@ package org.rfid.libdanrfid;
 
 public class DDMTag extends DDMData {
 
-	public static final byte AFI_ON=(byte)0x07;
-	public static final byte AFI_OFF=(byte)0xC2;
+	public static final byte AFI_ON=0x07;
+	public static final byte AFI_OFF=0x21; // TODO make AFI values configurable in java properties?
+	private static final String SysDummyHex="0355443322110004E00007";
+	private static final String SysDummyUnlockHex="0355443322110004E00021";
 
 	private byte afi=0;
 	public boolean isTainted=true; // we have not read all - or have made changes yet unwritten
@@ -30,6 +32,14 @@ public class DDMTag extends DDMData {
 	 */
 	public boolean isAFIsecured(){
 		return (AFI_ON==afi);
+	}
+	
+	/**
+	 * 
+	 * @return 8 bytes UID from Tag's sysinfo as Hex in uppercase. e.g. "E004010031323334"
+	 */
+	public String getUID(){
+		return Util.reverseHex(Util.toHex(sysinfo).substring(2,18).toUpperCase()); 
 	}
 	
 	/**
@@ -101,21 +111,19 @@ public class DDMTag extends DDMData {
 		return (res.toString());
 	}
 	
-	public DDMTag(byte[] in) {
-		super(in);
+	public DDMTag(byte[] userdata) {
+		super(userdata);
 		// Auto-generated constructor stub
 	}
 
-	public DDMTag(Byte[] array) {
-		super(array);
-		// Auto-generated constructor stub
+	public DDMTag(String hexstring) {
+		super(hexstring);
 	}
 
-	public DDMTag(String ins) {
-		super(ins);
-		// Auto-generated constructor stub
-	}
-
+	/**
+	 * this constructor currently creates a pure dummy tag, 
+	 * locked and with an obviously bogus UID
+	 */
 	public DDMTag() {
 //		super();
 		// Auto-generated constructor stub
