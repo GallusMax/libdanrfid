@@ -9,7 +9,7 @@ import java.net.URLEncoder;
 //import org.android.nfc.tech.Util;
 
 public class TagTAS implements Runnable{
-	protected static URL urlTas;
+	protected static URL urlTas;// TODO - set default url, or refuse to run, if not set?
 	protected static String strbaseUrlTas;
 	protected static boolean urlValid=false;
 	private String UID=null;
@@ -100,7 +100,7 @@ public class TagTAS implements Runnable{
 		try {
 			return dorequest(strbaseUrlTas + "?id=" + UID + "&bar=" + URLEncoder.encode(barcode));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -118,7 +118,7 @@ public class TagTAS implements Runnable{
 		try {
 			return dorequest(strbaseUrlTas + "?id=" + UID + "&udat=" + URLEncoder.encode(udat));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 		

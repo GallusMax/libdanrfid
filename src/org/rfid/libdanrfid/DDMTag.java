@@ -8,26 +8,43 @@ public class DDMTag extends DDMData {
 	private byte afi=0;
 	public boolean isTainted=true; // we have not read all - or have made changes yet unwritten
 	public byte[] sysinfo;
-	public boolean afiTainted;
+	public boolean afiTainted;  // we just changed tha AFI value and have not written to tag
 	
 	public byte getAFI(){
 		return afi;
 	}
 	
+	/**
+	 * 
+	 * @param AFI the new AFI value. Use (static) AFI_ON or AFI_OFF!
+	 */
 	public void setAFI(byte AFI){
 		this.afi=AFI;
 //		isTainted=true;
 		afiTainted=true;
 	}
 
+	/**
+	 * 
+	 * @return true, if currently AFI-locked 
+	 */
 	public boolean isAFIsecured(){
 		return (AFI_ON==afi);
 	}
 	
+	/**
+	 * set the DDMData part with the given byte[] in 
+	 * @param in byte[] containing prepared UserData according DanishDataModel
+	 */
 	public void addUserData(byte[] in){
 		initdata(in);
 	}
 	
+	/**
+	 * set the system part of the DDMTag from the given hex string s
+	 * @param s hex representation of system data
+	 * @return a byte[] containing the system data 
+	 */
 	public byte[] addSystemInformation(String s){
 		//TODO - skip first 0x00 byte from Android NfcV
 		if(s.startsWith("0x")) // rip off the leading 0x byte from hex String
@@ -38,10 +55,15 @@ public class DDMTag extends DDMData {
 			return null;
 		}else
 			return addSystemInformation(Util.hexStringToByteArray(s));
+		// TODO what about tainted?!
 	}
 
+	/**
+	 * set the system part of the DDMTag from tag data
+	 * @param read byte[] as read from tag
+	 * @return a byte[] containing the system data 
+	 */
 	public byte[] addSystemInformation(byte[] read){
-//		byte[] read=transceive((byte)0x2b);
 		sysinfo=read;
 //		if(0==read[0]){// no error byte from Android NfcV
 //			String s=new String(read);
@@ -62,9 +84,14 @@ public class DDMTag extends DDMData {
 		isTainted=false; // remember: we have read it and found it valid
 		return read;
 //		}
-//		return new byte[]{};
 	}
 
+	/**
+	 * 
+	 * @return formatted String showing the barcode and optional an item count 
+	 * @author Ulrich Hahn 
+	 * @since 0.4x (?)
+	 */	
 	public String toString(){
 		StringBuilder res=new StringBuilder(Barcode());
 		if(1<getofParts())
@@ -76,22 +103,33 @@ public class DDMTag extends DDMData {
 	
 	public DDMTag(byte[] in) {
 		super(in);
-		// TODO Auto-generated constructor stub
+		// Auto-generated constructor stub
 	}
 
 	public DDMTag(Byte[] array) {
 		super(array);
-		// TODO Auto-generated constructor stub
+		// Auto-generated constructor stub
 	}
 
 	public DDMTag(String ins) {
 		super(ins);
-		// TODO Auto-generated constructor stub
+		// Auto-generated constructor stub
 	}
 
 	public DDMTag() {
 //		super();
-		// TODO Auto-generated constructor stub
+		// Auto-generated constructor stub
+	}
+
+	/**
+	 * formatted line output for a Panel view. 
+	 * In the meantime it just overrides DDMData:toString()
+	 * @return formatted String showing the barcode and optional an item count 
+	 * @author Ulrich Hahn 
+	 * @since 0.4x (?)
+	 */
+	public String toDisplayLine() {
+		return this.toString();
 	}
 	
 }
