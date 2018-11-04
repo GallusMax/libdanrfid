@@ -21,7 +21,7 @@ public class TagTAS implements Runnable{
 	 * TODO throw Exception when URL is not valid
 	 * @param newurl
 	 */
-	public TagTAS(String newurl) {
+	public TagTAS(String newurl) 
 		strbaseUrlTas=newurl;
 		try {
 			urlTas = new URL(newurl);
