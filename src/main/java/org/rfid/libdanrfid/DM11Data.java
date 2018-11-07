@@ -119,7 +119,7 @@ public class DM11Data extends TagData{
 		build[7]=nibbleL(7);
 		*/
 // TODO fiddle ot the split digits		
-		return build.toString();
+		return new String(build);
 	}
 	
 	/**
