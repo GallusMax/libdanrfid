@@ -14,7 +14,9 @@ public class DDMDataTest {
 	@Test
 	public void testToString() {
 		DDMData data = new DDMData();
-		assertNotNull(data.toString());
+		String readData = data.toString();
+		DDMData dataFromString = new DDMData(readData);
+		assertEquals(readData, dataFromString.toString());
 	}
 
 	@Test
