@@ -1,7 +1,7 @@
 /*
-  	Copyright (C) 2011 Ulrich Hahn
+    Copyright (C) 2011 Ulrich Hahn
   	
-  	This program is free software: you can redistribute it and/or modify
+    This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -112,11 +112,12 @@ public class DM11Data extends TagData{
 	public String Barcode(){
 		String res=new String("........");
 		char[] build = res.toCharArray();
-
+/* testing
 		build[1]=nibbleH(2);
 		build[3]=nibbleL(4);
 		build[4]=nibbleH(5);
 		build[7]=nibbleL(7);
+		*/
 // TODO fiddle ot the split digits		
 		return build.toString();
 	}
