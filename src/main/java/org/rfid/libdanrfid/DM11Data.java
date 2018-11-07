@@ -25,20 +25,7 @@ package org.rfid.libdanrfid;
  *
  */
 public class DM11Data extends TagData{
-	/*
-	 * These presets are used when a blank record is created
-	 * customize here - ugly, too!
-	 */
-	public final String myCountry="DE";
-	public final String myISIL="705";
-	
-	/* one byte combines Version and media usage 
-	 * this is as ugly a these constants
-	 */
-	public static final char V1NEU=16; 		// 0x10
-	public static final int USAGE_NEU=0; 		// the usage nibble (the low for FKI, the high for bibliotheca) 
-	public static final char V1AUSLEIHBAR=17; 	// 0x11
-	
+
 	/**
 	 * @param args
 	 * usage: $0 <barcode> [more args?]
@@ -69,7 +56,7 @@ public class DM11Data extends TagData{
 	 * @param in - userdata as bytes read from tag
 	 */
 	public DM11Data(byte[] in){
-		initdata(in);
+		super(in);
 	}
 
 	/**
@@ -78,11 +65,7 @@ public class DM11Data extends TagData{
 	 * @return 
 	 */
 	public DM11Data(Byte[] array) {
-		byte[] ret=new byte[array.length];
-		for(int i=0;i<array.length;i++){
-			ret[i]=array[i].byteValue();
-		}
-		initdata(ret);
+		super(array);
 	}
 
 	 /**
@@ -90,40 +73,7 @@ public class DM11Data extends TagData{
 	  * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
 	  */
 	public DM11Data(String ins){
-		int startat=0;
-		ins.toLowerCase(); // ignore case
-		if(ins.startsWith("0x")){ // lets believe in HEX
-			startat=2;
-		}
-	
-		String hex=ins.substring(startat); // drop the leading 0x
-		
-		initdata(Util.hexStringToByteArray(hex));
-/*		
-		ArrayList<Byte> bal=new ArrayList<Byte>();
-		
-		  //49204c6f7665204a617661 split into two characters 49, 20, 4c...
-		  for( int i=0; i<hex.length()-1; i+=2 ){
-	 
-		      //grab the hex in pairs
-		      String output = hex.substring(i, (i + 2));
-		      //convert hex to decimal
-		      int decimal = Integer.parseInt(output, 16);
-		      //convert the decimal to character
-		      bal.add((byte)decimal);
-		  }
-		  
-	  bal.trimToSize();
-//	  DDMData((Byte[])bal.toArray());
-	  Object[] array= (bal.toArray());
-
-	  // copied helplessly
-		byte[] in=new byte[array.length];
-		for(int i=0;i<array.length;i++){
-			in[i]=((Byte)(array[i])).byteValue();
-		}
-		initdata(in);
-*/	
+		super(ins);
 	}
 	
 	/**
@@ -137,19 +87,6 @@ public class DM11Data extends TagData{
 		setISIL(myISIL);		
 	}
 
-	/**
-	 * HEX representation of the 32 byte payload of a tag
-	 * with the CRC updated
-	 */
-	public String toString(){
-		String res="";
-		updateCRC(); // the CRC is refreshed automagically before giving away the content
-		for (char d : userdata32) {
-			res=res.concat(String.format("%02x", (byte)d));			
-		}
-		return res;
-	}
-	
 	/**
 	 * get high nibble from byte 
 	 * @param i
@@ -191,72 +128,5 @@ public class DM11Data extends TagData{
 	public void setBarcode(String bc){
 		setStringAt(bc, 3, 16);
 	}
-	
-	
-	/**
-	 * extract the countrycode
-	 * @return
-	 */
-	public String Country(){
-		return new String(userdata32,21,2);
-	}
-	
-	/**
-	 * fill in the countrycode
-	 * @param iso
-	 */
-	public void setCountry(String iso){
-		setStringAt(iso, 21, 2);
-	}
-	
-	/**
-	 * extract the ISIL code
-	 * @return
-	 */
-	public String ISIL(){
-		String res= new String(userdata32,23,9); // the far end, even when ISIL allow for 11 chars
-		int i = res.indexOf(0);
-		if(i>0 && i<9)
-			return res.substring(0, res.indexOf(0));
-		else
-			return res;
-
-	}
-	/**
-	 * fill in the ISIL
-	 * @param iso
-	 */
-	public void setISIL(String s){
-		setStringAt(s, 23, 9);
-	}
-
-	/**
-	 * does this Itemcode belong to us? 
-	 * @param barcodePattern - the pattern to be checked against
-	 * @return - true if matches, or null or empty Pattern given
-	 */
-	public boolean barcodematch(String barcodePattern) {
-		if(null==barcodePattern)return true;
-		if(barcodePattern.isEmpty()) return true;
-		return Barcode().matches(barcodePattern);
-	}
-
-	/**
-	 * rfresh the CRC at the given position
-	 * @return the int value of the new CRC 
-	 */
-	public int updateCRC() {
-		int crc_sum=new CRC().DDCRC(userdata32);
-	
-		// replace existing CRC in given array
-		if(userdata32.length<21)return crc_sum; // dont step beyond - shouldnt happen
-		userdata32[19]=(char)(crc_sum & 0xff); // lsb first
-		int msb=crc_sum ;
-		msb>>=8;
-		userdata32[20]=(char)(msb & 0xff);
-		return crc_sum;
-	}
-	
-
 	
 }
