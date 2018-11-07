@@ -115,7 +115,7 @@ public class DM11Data extends TagData{
 
 		build[1]=nibbleH(2);
 		build[3]=nibbleL(4);
-		build[4]=nibbleH(5);
+		build[5]=nibbleH(5);
 		build[7]=nibbleL(7);
 		
 // TODO fiddle ot the split digits		
