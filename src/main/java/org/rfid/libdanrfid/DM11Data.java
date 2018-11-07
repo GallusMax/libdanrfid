@@ -93,7 +93,7 @@ public class DM11Data extends TagData{
 	 */
 	private char nibbleH(int i) {
 		
-		return (char) String.format("%1d",((userdata32[i] & 0xf0) >> 4))[0];
+		return (char) String.format("%1d",((userdata32[i] & 0xf0) >> 4)).charAt(0);
 	}
 	
 	/**
@@ -102,7 +102,7 @@ public class DM11Data extends TagData{
 	 */
 	private char nibbleL(int i) {
 		
-		return (char) String.format("%1d",(userdata32[i] & 0x0f))[0];
+		return (char) String.format("%1d",(userdata32[i] & 0x0f)).charAt(0);
 	}
 	
 	/**
