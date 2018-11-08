@@ -83,12 +83,34 @@ public class CRC {
 //System.out.format("%2h - %4x\n",(char)tag[i],crc_sum );
 		}
 		for (int i = tag.length; i < 34; i++) {
-			update_crc(0); // include two more null bytes to achieve the full length if ISIL code
+			update_crc(0); // include two more null bytes to achieve the full length
+		}
+		return crc_sum;
+	}
+
+	/**
+	 * return the CRC sum of the (at most)32 bytes of a RFID tag keeping in mind 
+	 * to fill up with nullbytes to 34 
+	 * the updating of byte pos 19 and 20 is left to the TagData instance
+	 * @param tag - the tag data
+	 * @param skip - position of CRC, to be skipped
+	 * @return
+	 */
+	public int tagCRC(char[] tag, int skip){
+		crc_sum=0xffff;
+		for (int i = 0; i < tag.length; i++) {
+			if((skip==i)||((skip+1)==i)) continue; //skip the position of the CRC thus ignoring if there is one already
+//System.out.format("%2h",tag[i]);
+			update_crc(tag[i]);
+//System.out.format("%2h - %4x\n",(char)tag[i],crc_sum );
+		}
+		for (int i = tag.length; i < 34; i++) {
+			update_crc(0); // include two more null bytes to achieve the full length
 		}
 		return crc_sum;
 	}
 	
-	private int computeCRC(char[] s){
+	protected int computeCRC(char[] s){
 		crc_sum=0xffff;
 
 		for (char b : s) {

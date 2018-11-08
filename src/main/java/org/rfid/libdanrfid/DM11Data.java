@@ -86,23 +86,59 @@ public class DM11Data extends TagData{
 		setCountry(myCountry);
 		setISIL(myISIL);		
 	}
+	
+	/**
+	 * test on CRC fields
+	 * TODO: this still fails - seed?
+	 * @return
+	 */
+	protected int DMCRC() {
+		return new CRC().tagCRC(userdata32, 14);
+/*		char[] work=userdata32.clone();
+		work[14]=0;
+		work[15]=0;
+		return new CRC().computeCRC(work);
+*/
+	}
+
+	/**
+	 * read the CRC as int, added up LSB first, MSB last
+	 * @return
+	 */
+	public int getCRC(){
+		int res=userdata32[15]&0xff;
+		res<<=8;
+		res+=userdata32[14]&0xff;
+		return res;
+	}
+	
 
 	/**
 	 * get high nibble from byte 
 	 * @param i
 	 */
-	private char nibbleH(int i) {
-		
-		return (char) String.format("%1d",((userdata32[i] & 0xf0) >> 4)).charAt(0);
+	private byte Hnibble(int i) {
+		return (byte) ((userdata32[i] & 0xf0) >> 4);
 	}
 	
 	/**
 	 * get low nibble from byte 
 	 * @param i
 	 */
-	private char nibbleL(int i) {
-		
-		return (char) String.format("%1d",(userdata32[i] & 0x0f)).charAt(0);
+	private byte Lnibble(int i) {
+		return (byte) (userdata32[i] & 0x0f);
+	}
+
+	/**
+	 * combine low half-nibble from byte h with high half-nibble of byte l 8-/
+	 * @param h
+	 * @param l
+	 * @return
+	 */
+	private byte HL2num(byte h, byte l) {
+		byte H=(byte)((h & 3) << 2);
+	    byte L=(byte)((l & 12) >> 2);
+	    return (byte)(H | L);
 	}
 	
 	/**
@@ -112,13 +148,16 @@ public class DM11Data extends TagData{
 	public String Barcode(){
 		String res=new String("........");
 		char[] build = res.toCharArray();
-
-		build[1]=nibbleH(2);
-		build[3]=nibbleL(4);
-		build[5]=nibbleH(5);
-		build[7]=nibbleL(7);
 		
-// TODO fiddle ot the split digits		
+		build[0]=String.format("%1d",this.HL2num(this.Lnibble(2),this.Hnibble(1))).charAt(0);
+		build[1]=String.format("%1d",Hnibble(2)).charAt(0);
+		build[2]=String.format("%1d",this.HL2num(this.Hnibble(3),this.Lnibble(3))).charAt(0);
+		build[3]=String.format("%1d",Lnibble(4)).charAt(0);
+		build[4]=String.format("%1d",this.HL2num(this.Lnibble(5),this.Hnibble(4))).charAt(0);
+		build[5]=String.format("%1d",Hnibble(5)).charAt(0);
+		build[6]=String.format("%1d",this.HL2num(this.Hnibble(6),this.Lnibble(6))).charAt(0);
+		build[7]=String.format("%1d",Lnibble(7)).charAt(0);
+		
 		return new String(build);
 	}
 	

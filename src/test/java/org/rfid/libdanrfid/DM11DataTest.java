@@ -28,6 +28,19 @@ public class DM11DataTest {
 	}
 	
 	@Test
+	public void testGetCRC() {
+		assertEquals(0x4cbb,new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555").getCRC());
+		assertEquals(0xcd0a,new DM11Data("0B410441100441100000000000000ACDA484FF4F42504401500400000000F555").getCRC());
+		assertEquals(18657,new DM11Data("0B41244D54655D10000000000000E148A484FF4F42504401500400000000F555").getCRC());
+	}
+	
+	@Test 
+	public void testDMCRC() {
+		DM11Data testCRC=new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
+		assertEquals(testCRC.getCRC(), testCRC.DMCRC());
+	}
+	
+	@Test
 	public void testBarcode() {
 		assertEquals("12345678",new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555").Barcode());
 		assertEquals("10000000",new DM11Data("0B410441100441100000000000000ACDA484FF4F42504401500400000000F555").Barcode());
@@ -41,8 +54,8 @@ public class DM11DataTest {
 
 	@Test
 	public void testBarcodematch() {
-		DM11Data data = new DM11Data("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
-		assertTrue(data.barcodematch("11223.+"));
+		DM11Data data = new DM11Data("0B41244D54655D10000000000000E148A484FF4F42504401500400000000F555"); // just simple
+		assertTrue(data.barcodematch("1234.+"));
 		assertFalse(data.barcodematch("abc.+"));
 	}
 
