@@ -93,7 +93,7 @@ public class CRC {
 	 * to fill up with nullbytes to 34 
 	 * the updating of byte pos 19 and 20 is left to the TagData instance
 	 * @param tag - the tag data
-	 * @param skip - position of CRC, to be skipped
+	 * @param skip - position of CRC to be skipped
 	 * @return
 	 */
 	public int tagCRC(char[] tag, int skip){

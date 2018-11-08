@@ -121,6 +121,11 @@ public class DM11Data extends TagData{
 		return (byte) ((userdata32[i] & 0xf0) >> 4);
 	}
 	
+	private void setHnibble(char v, int i) {
+		v = (char) ((v & 0x0f) << 4);
+		userdata32[i] = (char) ((userdata32[i] & 0x0f) | v); 
+	}
+	
 	/**
 	 * get low nibble from byte 
 	 * @param i
@@ -128,6 +133,12 @@ public class DM11Data extends TagData{
 	private byte Lnibble(int i) {
 		return (byte) (userdata32[i] & 0x0f);
 	}
+
+	private void setLnibble(char v, int i) {
+		v = (char) ((v & 0x0f));
+		userdata32[i] = (char) ((userdata32[i] & 0xf0) | v); 		
+	}
+	
 
 	/**
 	 * combine low half-nibble from byte h with high half-nibble of byte l 8-/
@@ -166,7 +177,11 @@ public class DM11Data extends TagData{
 	 * @param bc
 	 */
 	public void setBarcode(String bc){
-		setStringAt(bc, 3, 16);
+//		setStringAt(bc, 3, 16);
+		setHnibble(bc.charAt(1), 2);
+		setLnibble(bc.charAt(3), 4);
+		setHnibble(bc.charAt(5), 5);
+		setLnibble(bc.charAt(7), 7);
 	}
 	
 }
