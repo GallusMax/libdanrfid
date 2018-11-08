@@ -36,8 +36,9 @@ public class DM11DataTest {
 	
 	@Test 
 	public void testDMCRC() {
-		DM11Data testCRC=new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
-		assertEquals(testCRC.getCRC(), testCRC.DMCRC());
+		DM11Data testDm11=new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
+		assertEquals(testDm11.getCRC(), new CRC().tagCRC(testDm11.userdata32,14));
+		assertEquals(testDm11.getCRC(), testDm11.DMCRC());
 	}
 	
 	@Test
@@ -62,8 +63,8 @@ public class DM11DataTest {
 	@Test
 	public void testSetBarcode() {
 		DM11Data data = new DM11Data();
-		data.setBarcode("1g2h3j");
-		assertEquals("1g2h3j", data.Barcode());
+		data.setBarcode("76543210");
+		assertEquals("76543210", data.Barcode());
 	}
 
 }

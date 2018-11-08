@@ -22,15 +22,14 @@ public class DDMDataTest {
 	@Test
 	public void testGetCRC() {
 		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
-		data.toString();
+		assertNotNull(data.toString());
 		assertEquals((int)0x3e51, data.getCRC());
 	}
 
 	@Test
-	public void testcomputeCRC() {
+	public void testtagCRC() {
 		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000");
 //		assertNotNull(data.toString()); //sets CRC
-		assertTrue(data.compareCRC());
 		assertEquals(data.getCRC(),new CRC().tagCRC(data.userdata32,19));
 		
 	}
