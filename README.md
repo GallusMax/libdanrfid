@@ -1,6 +1,6 @@
 # libdanrfid
 ### RFID tags in libraries  
-..contain mainly an item code, a library and country code. libdanrfid is meant to become a swiss army knife when dealing with tag content widely known as danish data model.
+..contain mainly an item code, a library and country code. libdanrfid is meant to become a swiss army knife when dealing with tag content. Currently supported is the danish data model DDM and a bibliotheca coding called DM11.
 
 ### Whats the goal?
 
