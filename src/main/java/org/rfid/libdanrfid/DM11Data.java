@@ -26,6 +26,9 @@ package org.rfid.libdanrfid;
  */
 public class DM11Data extends TagData{
 
+	private final int[] byteorder = {2,1,3,5,4,6,7};  // order of relevant bytes on chip
+	private final int[] presorder = {1,0,3,6,5,4,7,8};  // presentation order of 3-tuples
+
 	/**
 	 * @param args
 	 * usage: $0 <barcode> [more args?]
@@ -88,22 +91,15 @@ public class DM11Data extends TagData{
 	}
 	
 	/**
-	 * test on CRC fields
-	 * TODO: this still fails - seed?
-	 * @return
+	 * TODO: this still fails - wrong seed? other system than danish data model?
+	 * @return - the newly computed CRC
 	 */
 	protected int DMCRC() {
 		return new CRC().tagCRC(userdata32, 14);
-/*		char[] work=userdata32.clone();
-		work[14]=0;
-		work[15]=0;
-		return new CRC().computeCRC(work);
-*/
 	}
 
 	/**
-	 * read the CRC as int, added up LSB first, MSB last
-	 * @return
+	 * @return the CRC as int, added up LSB first, MSB last
 	 */
 	public int getCRC(){
 		int res=userdata32[15]&0xff;
@@ -114,29 +110,64 @@ public class DM11Data extends TagData{
 	
 
 	/**
-	 * get high nibble from byte 
-	 * @param i
+	 * @param i - byte position within userdata32
+	 * @return the High Nibble from the byte at the position
 	 */
 	private byte Hnibble(int i) {
 		return (byte) ((userdata32[i] & 0xf0) >> 4);
 	}
 	
+	protected char hexCharAt(String in, int pos) {
+			
+		return (char)(Integer.parseInt(in.substring(pos, pos+1),16));
+	}
+	
+	/**
+	 * set the High Nibble from the byte at the position
+	 * @param v - the value (cut as 0x0f) to be set
+	 * @param i - byte position within userdata32
+	 */
 	private void setHnibble(char v, int i) {
 		v = (char) ((v & 0x0f) << 4);
 		userdata32[i] = (char) ((userdata32[i] & 0x0f) | v); 
 	}
 	
+	private void setHLnibble(char v, int i) {
+		v = (char) ((v & 0x03) << 4);
+		userdata32[i] = (char) ((userdata32[i] & 0xcf) | v); 
+	}
+	
+	private void setHHnibble(char v, int i) {
+		v = (char) ((v & 0x03) << 6);
+		userdata32[i] = (char) ((userdata32[i] & 0x3f) | v); 
+	}
+	
 	/**
-	 * get low nibble from byte 
-	 * @param i
+	 * @param i - byte position within userdata32
+	 * @return the Low Nibble from the byte at the position
 	 */
 	private byte Lnibble(int i) {
 		return (byte) (userdata32[i] & 0x0f);
 	}
 
+	/**
+	 * set the Low Nibble from the byte at the position
+	 * @param v - the value (cut as 0x0f) to be set
+	 * @param i - byte position within userdata32
+	 */
 	private void setLnibble(char v, int i) {
 		v = (char) ((v & 0x0f));
 		userdata32[i] = (char) ((userdata32[i] & 0xf0) | v); 		
+	}
+	
+	private void setLLnibble(char v, int i) {
+		v = (char) ((v & 0x03));
+		userdata32[i] = (char) ((userdata32[i] & 0xfc) | v); 		
+	}
+	
+	private void setLHnibble(char v, int i) {
+		v = (char) ((v & 0x03) << 2);
+		userdata32[i] = (char) ((userdata32[i] & 0xf3) | v); 		
 	}
 	
 
@@ -144,13 +175,13 @@ public class DM11Data extends TagData{
 	 * combine low half-nibble from byte h with high half-nibble of byte l 8-/
 	 * @param h
 	 * @param l
-	 * @return
 	 */
 	private byte HL2num(byte h, byte l) {
 		byte H=(byte)((h & 3) << 2);
 	    byte L=(byte)((l & 12) >> 2);
 	    return (byte)(H | L);
 	}
+	
 	
 	/**
 	 * extract the barcode to a string
@@ -160,28 +191,43 @@ public class DM11Data extends TagData{
 		String res=new String("........");
 		char[] build = res.toCharArray();
 		
-		build[0]=String.format("%1d",this.HL2num(this.Lnibble(2),this.Hnibble(1))).charAt(0);
-		build[1]=String.format("%1d",Hnibble(2)).charAt(0);
-		build[2]=String.format("%1d",this.HL2num(this.Hnibble(3),this.Lnibble(3))).charAt(0);
-		build[3]=String.format("%1d",Lnibble(4)).charAt(0);
-		build[4]=String.format("%1d",this.HL2num(this.Lnibble(5),this.Hnibble(4))).charAt(0);
-		build[5]=String.format("%1d",Hnibble(5)).charAt(0);
-		build[6]=String.format("%1d",this.HL2num(this.Hnibble(6),this.Lnibble(6))).charAt(0);
-		build[7]=String.format("%1d",Lnibble(7)).charAt(0);
+		build[0]=Integer.toHexString(this.HL2num(this.Lnibble(2),this.Hnibble(1))).charAt(0);
+		build[1]=Integer.toHexString(this.Hnibble(2)).charAt(0);
+		build[2]=Integer.toHexString(this.HL2num(this.Hnibble(3),this.Lnibble(3))).charAt(0);
+		build[3]=Integer.toHexString(this.Lnibble(4)).charAt(0);
+		build[4]=Integer.toHexString(this.HL2num(this.Lnibble(5),this.Hnibble(4))).charAt(0);
+		build[5]=Integer.toHexString(this.Hnibble(5)).charAt(0);
+		build[6]=Integer.toHexString(this.HL2num(this.Hnibble(6),this.Lnibble(6))).charAt(0);
+		build[7]=Integer.toHexString(this.Lnibble(7)).charAt(0);
 		
 		return new String(build);
 	}
 	
 	/**
 	 * fill in the Barcode
+	 * this is really ugly..
 	 * @param bc
 	 */
 	public void setBarcode(String bc){
-//		setStringAt(bc, 3, 16);
-		setHnibble(bc.charAt(1), 2);
-		setLnibble(bc.charAt(3), 4);
-		setHnibble(bc.charAt(5), 5);
-		setLnibble(bc.charAt(7), 7);
+		setLLnibble((char)((hexCharAt(bc,0) & 0xc) >> 2), 2);
+		setHHnibble(hexCharAt(bc,0), 1);
+
+		setHnibble(hexCharAt(bc,1), 2);
+
+		setLHnibble(hexCharAt(bc,2), 3);
+		setHLnibble((char)((hexCharAt(bc,2) & 0xc) >> 2), 3);		
+
+		setLnibble(hexCharAt(bc,3), 4);
+
+		setLLnibble((char)((hexCharAt(bc,4) & 0xc) >> 2), 5);
+		setHHnibble(hexCharAt(bc,4), 4);
+
+		setHnibble(hexCharAt(bc,5), 5);
+
+		setLHnibble(hexCharAt(bc,6), 6);
+		setHLnibble((char)((hexCharAt(bc,6) & 0xc) >> 2), 6);		
+		
+		setLnibble(hexCharAt(bc,7), 7);
 	}
 	
 }
