@@ -16,12 +16,13 @@ public class DDMfindingsTest
      */
     @Test
     public void testTrivia() {
+    	double delta = 1e-6;
     	DDMfindings f = new DDMfindings(new DDMData());
         assertTrue( true );
-    	assertEquals(f.good, f.good());
-    	assertEquals(f.threshold, f.threshold());
+    	assertEquals(f.good, f.good(),delta);
+    	assertEquals(f.threshold, f.threshold(), delta);
     	f.setthreshold(0.6);
-    	assertEquals(0.6, f.threshold());
+    	assertEquals(0.6, f.threshold(), delta);
     	assertTrue(f.trusted());
     	f.good=0.5;
     	assertFalse(f.trusted());
