@@ -17,6 +17,10 @@ public class DM11DataTest {
 		String readData = data.toString();
 		DM11Data dataFromString = new DM11Data(readData);
 		assertEquals(readData, dataFromString.toString());
+		data = new DM11Data("11010131313232333334340000000000000000513e4445373035000000000000");
+		readData = data.toString();
+		dataFromString = new DM11Data(readData);
+		assertEquals(readData, dataFromString.toString());
 	}
 
 	@Test
