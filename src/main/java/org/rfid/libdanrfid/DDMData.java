@@ -91,7 +91,7 @@ public class DDMData extends TagData{
 	 * @param in - userdata as bytes read from tag
 	 */
 	public DDMData(byte[] in){
-		super(in);
+		super(TAG_DDM,in);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class DDMData extends TagData{
 	 * @return 
 	 */
 	public DDMData(Byte[] array) {
-		super(array);
+		super(TAG_DDM,array);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class DDMData extends TagData{
 	 * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
 	 */
 	public DDMData(String ins){
-		super(ins);
+		super(TAG_DDM,ins);
 	}
 	
 	/**

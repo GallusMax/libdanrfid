@@ -59,7 +59,7 @@ public class DM11Data extends TagData{
 	 * @param in - userdata as bytes read from tag
 	 */
 	public DM11Data(byte[] in){
-		super(in);
+		super(TAG_DM11,in);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class DM11Data extends TagData{
 	 * @return 
 	 */
 	public DM11Data(Byte[] array) {
-		super(array);
+		super(TAG_DM11,array);
 	}
 
 	 /**
@@ -76,7 +76,7 @@ public class DM11Data extends TagData{
 	  * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
 	  */
 	public DM11Data(String ins){
-		super(ins);
+		super(TAG_DM11,ins);
 	}
 	
 	/**

@@ -34,12 +34,35 @@ public class TagData extends Object {
 	  */
 	protected boolean foundCRCok = false;
 
+	public final static int TAG_UNKNOWN=0;
+	public final static int TAG_DDM=1;
+	public final static int TAG_DM11=2;
+	protected int tagType=TAG_UNKNOWN; // inititlly unknown
+	
+	DDMData ddmInstance;
+	DM11Data dm11Instance;
+
+
+	public TagData(int tagHint,byte[] in){
+		tagType = tagHint;
+		addUserData(in);
+	}
+
 	/**
 	 * constructor from byte[] Array
 	 * @param in - userdata as bytes read from tag
 	 */
 	public TagData(byte[] in){
-		initdata(in);
+		this(TAG_UNKNOWN,in);
+	}
+
+	public TagData(int tagHint, Byte[] array) {
+		tagType=tagHint;
+		byte[] ret=new byte[array.length];
+		for(int i=0;i<array.length;i++){
+			ret[i]=array[i].byteValue();
+		}
+		addUserData(ret);
 	}
 
 	/**
@@ -48,18 +71,11 @@ public class TagData extends Object {
 	 * @return 
 	 */
 	public TagData(Byte[] array) {
-		byte[] ret=new byte[array.length];
-		for(int i=0;i<array.length;i++){
-			ret[i]=array[i].byteValue();
-		}
-		initdata(ret);
+		this(TAG_UNKNOWN,array);
 	}
-
-	 /**
-	  * constructor from Hex String as from toString()
-	  * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
-	  */
-	public TagData(String ins){
+		
+	public TagData(int tagHint, String ins) {
+		tagType=tagHint;
 		int startat=0;
 		ins.toLowerCase(); // ignore case
 		if(ins.startsWith("0x")){ // lets believe in HEX
@@ -68,7 +84,15 @@ public class TagData extends Object {
 	
 		String hex=ins.substring(startat); // drop the leading 0x
 		
-		initdata(Util.hexStringToByteArray(hex));
+		addUserData(Util.hexStringToByteArray(hex));
+	}
+
+	 /**
+	  * constructor from Hex String as from toString()
+	  * @param ins - 32 byte userdata as read from the tag, an optional "0x" prefix will be ignored
+	  */
+	public TagData(String ins){
+		this(TAG_UNKNOWN,ins);
 	}
 	
 	/**
@@ -80,14 +104,15 @@ public class TagData extends Object {
 	}
 
 	/**
-	 * DDMData will verify the CRC
-	 * and possibly revert the block byte order(!)
-	 * @return true as default here
+	 * DM11Data just checks that only decimals can be encoded
+	 * @return true if only decimals found
 	 */
 	public boolean isvalid() {
-		return true;
-			}
-
+		if(Barcode().matches("[0-9a-f]+")) 
+			return true;
+		return false;
+	}
+	
 	/**
 	 * prepare single block for writing.
 	 * byteorder remains reversed, if found reversed during read
@@ -201,7 +226,14 @@ public class TagData extends Object {
 	 * @param in - the byte[] to be set
 	 */
 	public void addUserData(byte[] in) {
-		initdata(in);
+		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
+			if(i<in.length) // any case..
+				userdata32[i]=(char)in[i];
+			else
+				userdata32[i]=(char)0; // init all
+		}
+		
+		if(TAG_UNKNOWN == tagType) initdata(in);
 	}
 
 	/**
@@ -222,17 +254,21 @@ public class TagData extends Object {
 	 * @param in - a byte array as read from
 	 */
 	protected void initdata(byte[] in) {
-		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
-			if(i<in.length) // any case..
-				userdata32[i]=(char)in[i];
-			else
-				userdata32[i]=(char)0; // init all
-		}
+		
+		//TODO find out if DDM or DM11
 		// is this a crc ok Record?
 		// nb: reverts the block byte order, if necessary
-		foundCRCok=isvalid();
+//		foundCRCok=isvalid();
 		
-		keepshadowdata(); // keep this state in order to track the changes		
+//		keepshadowdata(); // keep this state in order to track the changes		
+
+		// first the rather weak check on hex Barcode
+		dm11Instance = new DM11Data(in);
+		if(dm11Instance.isvalid()) tagType = TAG_DM11;
+
+		// then the CRC check of DDM TODO - doesnt work!
+		ddmInstance = new DDMData(in);
+		if(ddmInstance.isvalid()) tagType = TAG_DDM;
 	}
 
 	/**
