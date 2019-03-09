@@ -22,10 +22,11 @@ public class CRCTest {
 	}
 
 	/**
-	 * Test method for {@link org.rfid.libdanrfid.CRC#CRC(char[])}.
+	 * Test method for {@link org.rfid.libdanrfid.CRC}.
 	 */
 	@Test
-	public void testCRCCharArray() {
+	public void testCRCreference() {
+		assertEquals(CRC.referenceCRC,new CRC(CRC.referenceString).gethex());
 	}
 
 	/**
