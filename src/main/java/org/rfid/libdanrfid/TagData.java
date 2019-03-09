@@ -21,7 +21,8 @@ public class TagData extends Object {
 	 * a cure would be a reference implementation 
 	 * 
 	 */
-	protected char[] forward32 = new char[32]; // represents the tag user fields
+//	protected char[] forward32 = new char[32]; // represents the tag user fields
+	protected char[] forward32 = null; // created in subclass represents the tag user fields
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
 	protected char[] shadowdata; // keep array as initialized for change tracking
@@ -100,6 +101,7 @@ public class TagData extends Object {
 	 */
 	public TagData() {
 		super();
+		if(null==userdata32) userdata32 = new char[32];
 		keepshadowdata();
 	}
 
@@ -111,7 +113,7 @@ public class TagData extends Object {
 	 * TODO : with respect to ordering? ;-)
 	 */
 	public byte[] getblock(int n) {
-		return getblock(n,4,false); // default to blocksize 4
+		return getblock(n,4,false); // default to blocksize 4 TODO: real blocksize
 	}
 
 	/**
@@ -216,6 +218,7 @@ public class TagData extends Object {
 	 * @param in - the byte[] to be set
 	 */
 	public void addUserData(byte[] in) {
+		if(null==userdata32) userdata32 = new char[32];
 		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
 			if(i<in.length) // any case..
 				userdata32[i]=(char)in[i];
@@ -309,7 +312,14 @@ public class TagData extends Object {
 	 * @return
 	 */
 	public String Barcode() {
-		// TODO Auto-generated method stub
+		switch (tagType){
+			case TAG_DDM:
+				return ddmInstance.Barcode();
+
+			case  TAG_DM11:
+				return dm11Instance.Barcode();
+		}
+
 		return "dummyBarcode";
 	}
 
@@ -318,8 +328,14 @@ public class TagData extends Object {
 	 * @param bc
 	 */
 	public void setBarcode(String bc) {
-		// TODO Auto-generated method stub
-		
+		switch (tagType){
+			case TAG_DDM:
+				ddmInstance.setBarcode(bc);
+				break;
+			case TAG_DM11:
+				dm11Instance.setBarcode(bc);
+				break;
+		}
 	}
 
 	/**
@@ -327,7 +343,12 @@ public class TagData extends Object {
 	 * read from Tag, if possible
 	 */
 	public String Country(){
-		return myCountry;	
+		switch (tagType){
+			case TAG_DDM:
+				return ddmInstance.Country();
+
+		}
+		return myCountry;
 	}
 	
 	/**
@@ -335,6 +356,12 @@ public class TagData extends Object {
 	 * @param iso
 	 */
 	public void setCountry(String iso){
+		switch (tagType){
+			case TAG_DDM:
+				ddmInstance.setCountry(iso);
+			break;
+
+		}
 	}
 	
 	/**
@@ -342,14 +369,25 @@ public class TagData extends Object {
 	 * @return - the ISIL as String
 	 */
 	public String ISIL(){
-			return myISIL;
+		switch (tagType){
+			case TAG_DDM:
+				return ddmInstance.ISIL();
 
+		}
+			return myISIL;
 	}
 	/**
 	 * fill in the ISIL
-	 * @param iso
+	 * @param isil
 	 */
-	public void setISIL(String s){
+	public void setISIL(String isil){
+		switch (tagType){
+			case TAG_DDM:
+				ddmInstance.setISIL(isil);
+			break;
+
+		}
+
 	}
 
 	/**
@@ -366,7 +404,12 @@ public class TagData extends Object {
 	}
 	
 	public int updateCRC() {
-		// TODO Auto-generated method stub
+		switch (tagType){
+			case TAG_DDM:
+				return ddmInstance.updateCRC();
+
+		}
+
 		return 0;
 	}
 	

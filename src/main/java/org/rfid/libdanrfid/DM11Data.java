@@ -85,7 +85,8 @@ public class DM11Data extends TagData{
 	 * - County and ISIL initialized with default values (hard coded)
 	 */
 	public DM11Data(){
-		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
+//		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
+		super();
 		setCountry(myCountry);
 		setISIL(myISIL);		
 	}
@@ -227,6 +228,7 @@ public class DM11Data extends TagData{
 	 * @param bc
 	 */
 	public void setBarcode(String bc){
+		if(!bc.matches("[0-9a-f]+")) return;
 		setLLnibble((char)((hexCharAt(bc,0) & 0xc) >> 2), 2);
 		setHHnibble(hexCharAt(bc,0), 1);
 
