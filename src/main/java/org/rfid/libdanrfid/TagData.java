@@ -104,16 +104,6 @@ public class TagData extends Object {
 	}
 
 	/**
-	 * DM11Data just checks that only decimals can be encoded
-	 * @return true if only decimals found
-	 */
-	public boolean isvalid() {
-		if(Barcode().matches("[0-9a-f]+")) 
-			return true;
-		return false;
-	}
-	
-	/**
 	 * prepare single block for writing.
 	 * byteorder remains reversed, if found reversed during read
 	 * @param n - the block index
@@ -262,13 +252,14 @@ public class TagData extends Object {
 		
 //		keepshadowdata(); // keep this state in order to track the changes		
 
-		// first the rather weak check on hex Barcode
 		dm11Instance = new DM11Data(in);
-		if(dm11Instance.isvalid()) tagType = TAG_DM11;
 
-		// then the CRC check of DDM TODO - doesnt work!
+		// rely on CRC check of DDM
 		ddmInstance = new DDMData(in);
-		if(ddmInstance.isvalid()) tagType = TAG_DDM;
+			if(ddmInstance.isvalid()) tagType = TAG_DDM;
+			else // if this fails, there is a chance of finding a DM11
+				if(dm11Instance.isvalid()) tagType = TAG_DM11;
+
 	}
 
 	/**
@@ -304,6 +295,13 @@ public class TagData extends Object {
 			else
 				userdata32[start+i]=s.charAt(i);			
 		}				
+	}
+
+	/**
+	 * @return true. always.
+	 */
+	public boolean isvalid() {
+			return true;
 	}
 
 	/**

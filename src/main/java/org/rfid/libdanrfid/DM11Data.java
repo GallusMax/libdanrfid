@@ -99,6 +99,24 @@ public class DM11Data extends TagData{
 	}
 
 	/**
+	 * DM11Data just checks that only decimals will be encoded
+	 * @return true if only decimals found
+	 */
+	public boolean isvalid() {
+		if(Barcode().matches("[0-9]+")
+			&& tailMatch()
+		)
+			return true;
+		return false;
+	}
+
+	protected boolean tailMatch(){
+		return (
+				(((byte) 0xf5) == (byte)userdata32[30])
+				&& (( 0x55) == (byte)userdata32[31]));
+	}
+
+	/**
 	 * @return the CRC as int, added up LSB first, MSB last
 	 */
 	public int getCRC(){
@@ -229,5 +247,6 @@ public class DM11Data extends TagData{
 		
 		setLnibble(hexCharAt(bc,7), 7);
 	}
-	
+
+
 }

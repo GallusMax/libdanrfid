@@ -25,10 +25,12 @@ public class DM11DataTest {
 
 	@Test
 	public void testIsValid() {
-		DM11Data data = new DM11Data("11010131313232333334340000000000000000"); // too short, no CRC
+		DM11Data data = new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
 		assertTrue(data.isvalid());
 		assertNotNull(data.toString());
 		assertTrue(data.isvalid());
+		data = new DM11Data("11010131313232333334340000000000000000513e4445373035000000000000");
+		assertFalse(data.isvalid());
 	}
 	
 	@Test
