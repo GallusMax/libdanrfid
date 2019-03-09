@@ -28,7 +28,7 @@ public class TagDataTest {
 		assertEquals(TagData.TAG_DM11, data.tagType);
 
 		data = new TagData("11010131313232333334340000000000000000513e4445373035000000000000");
-		assertEquals(TagData.TAG_DM11, data.tagType);
+		assertEquals(TagData.TAG_DDM, data.tagType);
 		
 	}
 

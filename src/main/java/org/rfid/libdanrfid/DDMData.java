@@ -159,7 +159,6 @@ public class DDMData extends TagData{
 	 * @return false if both block directions do not produce a valid CRC
 	 * the block direction will be reverted again, if both do not match
 	 */
-	@Override
 	public boolean isvalid(){
 		if(compareCRC())return true;
 		reverseblocks();
