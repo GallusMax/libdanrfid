@@ -91,7 +91,9 @@ public class DDMData extends TagData{
 	 * @param in - userdata as bytes read from tag
 	 */
 	public DDMData(byte[] in){
-		super(TAG_DDM,in);
+//	    tagType=TAG_DDM;
+//		addUserData(in);
+        super(TAG_DDM,in);
 	}
 
 	/**

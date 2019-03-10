@@ -22,7 +22,7 @@ public class TagData extends Object {
 	 * 
 	 */
 //	protected char[] forward32 = new char[32]; // represents the tag user fields
-	protected char[] forward32 = null; // created in subclass represents the tag user fields
+	protected char[] forward32 = new char[32]; // created in subclass represents the tag user fields
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
 	protected char[] shadowdata; // keep array as initialized for change tracking
