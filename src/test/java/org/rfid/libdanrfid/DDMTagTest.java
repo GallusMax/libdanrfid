@@ -9,26 +9,43 @@ import static org.junit.Assert.assertTrue;
 
 public class DDMTagTest {
 
+	private static final String UserDummyHex="11010131313232333334340000000000000000513e4445373035000000000000";
+	private static final String UserEmptyHex="11010100000000000000000000000000000000ca9f4445373035000000000000";
+	
 	// test values without blocksize/memsize info!
 	private static final String SysDummyHex="0355443322110004E00007";
 	private static final String SysDummyUnlockHex="0355443322110004E00021";
 
 	@Test
-	public void testDDMTagString() {
-		assertNotNull(new DDMTag("11010131313232333334340000000000000000513e4445373035000000000000").toString()); // just simple
+	public void testDDMTagToString() {
+		assertNotNull(new DDMTag().toString()); // just simple
+		assertEquals(UserEmptyHex, new DDMTag().toString());
 	}
 
 	@Test
-	public void testToString() {
-		DDMTag data = new DDMTag("11010131313232333334340000000000000000513e4445373035000000000000");
-		assertEquals("11223344 needs write", data.toString());
+	public void testFromString() {
+		DDMTag data = new DDMTag(UserDummyHex);
+		assertEquals(UserDummyHex, data.toString());
 	}
 
 	@Test
-	public void testCompareCRC() {
-		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
-		data.toString();
+	public void testFoundCRC() {
+		DDMTag data = new DDMTag("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+//		data.toString();
 		assertEquals((int)0x3e51, data.getCRC());
+	}
+
+	@Test
+	public void testBarcode() {
+		String testcode="07050706";
+//		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+		DDMTag data = new DDMTag();
+		data.setBarcode(testcode);
+		String barcode = data.Barcode();
+		assertEquals(testcode,barcode);
+		DDMTag tag = new DDMTag("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+		String tbarcode = tag.Barcode();
+		assertEquals("11223344",tbarcode);
 	}
 
 	@Test

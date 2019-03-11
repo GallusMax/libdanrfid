@@ -43,14 +43,6 @@ public class DDMTag extends DDMData {
 	}
 	
 	/**
-	 * set the DDMData part with the given byte[] in 
-	 * @param in byte[] containing prepared UserData according DanishDataModel
-	 */
-	public void addUserData(byte[] in){
-		initdata(in);
-	}
-	
-	/**
 	 * set the system part of the DDMTag from the given hex string s
 	 * @param s hex representation of system data
 	 * @return a byte[] containing the system data 
@@ -97,12 +89,12 @@ public class DDMTag extends DDMData {
 	}
 
 	/**
-	 * 
+	 * formatted line output for a Panel view. 
 	 * @return formatted String showing the barcode and optional an item count 
 	 * @author Ulrich Hahn 
 	 * @since 0.4x (?)
 	 */	
-	public String toString(){
+	public String toDisplayLine(){
 		StringBuilder res=new StringBuilder(Barcode());
 		if(1<getofParts())
 			res.append(" "+getPartNum()+"/"+getofParts());
@@ -113,7 +105,6 @@ public class DDMTag extends DDMData {
 	
 	public DDMTag(byte[] userdata) {
 		super(userdata);
-		// Auto-generated constructor stub
 	}
 
 	public DDMTag(String hexstring) {
@@ -125,8 +116,8 @@ public class DDMTag extends DDMData {
 	 * locked and with an obviously bogus UID
 	 */
 	public DDMTag() {
-//		super();
-		// Auto-generated constructor stub
+		super();
+		addSystemInformation(Util.hexStringToByteArray(SysDummyHex));
 	}
 
 	/**
@@ -136,8 +127,37 @@ public class DDMTag extends DDMData {
 	 * @author Ulrich Hahn 
 	 * @since 0.4x (?)
 	 */
-	public String toDisplayLine() {
-		return this.toString();
+//	public String toString() {
+//		return super.toString();
+//	}
+	
+	/**
+	 * @param args
+	 * usage: $0 <barcode> [more args?]
+	 * prints out the 32 byte Tag user data 
+	 * complete with CRC according Daenisches Datenmodell
+	 */
+	public static void main(String[] args) {
+
+		if(0==args.length){
+			usage();
+			return;
+		}
+		
+		DDMTag td=new DDMTag();
+		td.setBarcode(args[0]);
+		System.out.format("Barcode %s\n", td.Barcode());
+		System.out.format("toString %s\n", td.toString());
+		System.out.format("toDisplayLine %s\n", td.toDisplayLine());
+//		System.out.format("userdata32 %s\n", Util.toHex(td.userdata32));
+		
 	}
+	
+	public static void usage(){
+		System.out.format("usage: $0 <barcode>\n");
+		System.out.format("will return the 32 byte userdata of a RFID Tag\n");
+	}
+
+
 	
 }

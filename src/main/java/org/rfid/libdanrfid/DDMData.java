@@ -91,8 +91,6 @@ public class DDMData extends TagData{
 	 * @param in - userdata as bytes read from tag
 	 */
 	public DDMData(byte[] in){
-//	    tagType=TAG_DDM;
-//		addUserData(in);
         super(TAG_DDM,in);
 	}
 
@@ -253,6 +251,7 @@ public class DDMData extends TagData{
 	public byte getVersionUsage(){
 		return (byte)(userdata32[0]&0xff);
 	}
+	
 	@Override
 	public String Barcode(){
 		String res=new String(userdata32, 3, 16);

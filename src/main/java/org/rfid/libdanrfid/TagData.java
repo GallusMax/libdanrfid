@@ -22,7 +22,7 @@ public class TagData extends Object {
 	 * 
 	 */
 //	protected char[] forward32 = new char[32]; // represents the tag user fields
-	protected char[] forward32 = new char[32]; // created in subclass represents the tag user fields
+	protected char[] forward32 = null; // set in subclass represents the tag user fields
 //	protected char[] reverse32 = new char[32]; // reversed block order
 	protected char[] userdata32=forward32;
 	protected char[] shadowdata; // keep array as initialized for change tracking
@@ -54,7 +54,8 @@ public class TagData extends Object {
 	 * @param in - userdata as bytes read from tag
 	 */
 	public TagData(byte[] in){
-		this(TAG_UNKNOWN,in);
+//		this(TAG_UNKNOWN,in);
+		initdata(in);
 	}
 
 	public TagData(int tagHint, Byte[] array) {
@@ -71,9 +72,11 @@ public class TagData extends Object {
 	 * @param array - the Byte Object array 
 	 * @return 
 	 */
-	public TagData(Byte[] array) {
-		this(TAG_UNKNOWN,array);
-	}
+	// TODO Byte[] (needed?)
+//	public TagData(Byte[] array) {
+////		this(TAG_UNKNOWN,array);
+//		initdata(array);
+//	}
 		
 	public TagData(int tagHint, String ins) {
 		tagType=tagHint;
@@ -82,7 +85,6 @@ public class TagData extends Object {
 		if(ins.startsWith("0x")){ // lets believe in HEX
 			startat=2;
 		}
-	
 		String hex=ins.substring(startat); // drop the leading 0x
 		
 		addUserData(Util.hexStringToByteArray(hex));
@@ -214,7 +216,7 @@ public class TagData extends Object {
 	}
 
 	/**
-	 * pre-set the (32 Byte) userdate 
+	 * pre-set the (32 Byte) userdata from a byte[]
 	 * @param in - the byte[] to be set
 	 */
 	public void addUserData(byte[] in) {
@@ -230,6 +232,13 @@ public class TagData extends Object {
 	}
 
 	/**
+	 * getter for the one userdata32 char array
+	 */
+	protected char[] getUserData() {
+		return userdata32;
+	}
+	
+	/**
 	 * compares a single byte between current array and original array
 	 * @param i
 	 * @return true if byte i was changed
@@ -243,18 +252,12 @@ public class TagData extends Object {
 	}
 
 	/**
-	 * initialize the 32 byte user data array
-	 * @param in - a byte array as read from
+	 * at this point we do not know which tag lies ahead. 
+	 * instantiate all known tag models ant check which may be valid
+	 * @param in - an unknown byte array as read in
 	 */
 	protected void initdata(byte[] in) {
 		
-		//TODO find out if DDM or DM11
-		// is this a crc ok Record?
-		// nb: reverts the block byte order, if necessary
-//		foundCRCok=isvalid();
-		
-//		keepshadowdata(); // keep this state in order to track the changes		
-
 		dm11Instance = new DM11Data(in);
 
 		// rely on CRC check of DDM
@@ -270,8 +273,8 @@ public class TagData extends Object {
 	 */
 	protected void keepshadowdata() {
 		shadowdata=userdata32.clone();
-		for(int i=0;i<userdata32.length;i++)
-			shadowdata[i]=(char)(userdata32[i]&0xff); // chars may have a sign?
+//		for(int i=0;i<userdata32.length;i++)
+//			shadowdata[i]=(char)(userdata32[i]&0xff); // chars may have a sign?
 	}
 	
 	

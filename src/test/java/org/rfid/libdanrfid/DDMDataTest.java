@@ -17,12 +17,19 @@ public class DDMDataTest {
 		String readData = data.toString();
 		DDMData dataFromString = new DDMData(readData);
 		assertEquals(readData, dataFromString.toString());
+		assertTrue(data.compareCRC());
 	}
 
 	@Test
-	public void testGetCRC() {
+	public void testCompareCRC() {
 		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
-		assertNotNull(data.toString());
+		assertTrue(data.compareCRC());
+	}
+	
+	@Test
+	public void testGetCRC() {
+			DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+//		assertNotNull(data.toString()); // CRC is OK on test data
 		assertEquals((int)0x3e51, data.getCRC());
 	}
 
