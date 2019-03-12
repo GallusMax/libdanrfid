@@ -86,7 +86,8 @@ public class DM11Data extends TagData{
 	 */
 	public DM11Data(){
 //		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
-		super();
+		addUserData(new byte[32]);
+		keepshadowdata();
 		setCountry(myCountry);
 		setISIL(myISIL);		
 	}
@@ -248,6 +249,11 @@ public class DM11Data extends TagData{
 		setHLnibble((char)((hexCharAt(bc,6) & 0xc) >> 2), 6);		
 		
 		setLnibble(hexCharAt(bc,7), 7);
+	}
+
+	public int updateCRC() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 

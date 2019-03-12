@@ -18,6 +18,8 @@ public class DDMTagTest {
 
 	@Test
 	public void testDDMTagToString() {
+		DDMTag data = new DDMTag();
+		assertEquals(TagData.TAG_DDM, data.tagType);
 		assertNotNull(new DDMTag().toString()); // just simple
 		assertEquals(UserEmptyHex, new DDMTag().toString());
 	}
@@ -33,12 +35,13 @@ public class DDMTagTest {
 		DDMTag data = new DDMTag("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
 //		data.toString();
 		assertEquals((int)0x3e51, data.getCRC());
+		data.toString(); // recomputes the CRC
+		assertEquals((int)0x3e51, data.getCRC());
 	}
 
 	@Test
 	public void testBarcode() {
 		String testcode="07050706";
-//		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
 		DDMTag data = new DDMTag();
 		data.setBarcode(testcode);
 		String barcode = data.Barcode();

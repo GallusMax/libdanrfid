@@ -1,6 +1,6 @@
 package org.rfid.libdanrfid;
 
-public class LibTag extends DDMData {
+public class LibTag extends TagData {
 
 	public static final byte AFI_ON=0x07;
 	public static final byte AFI_OFF=0x21; // TODO make AFI values configurable in java properties?
@@ -88,21 +88,6 @@ public class LibTag extends DDMData {
 //		}
 	}
 
-	/**
-	 * formatted line output for a Panel view. 
-	 * @return formatted String showing the barcode and optional an item count 
-	 * @author Ulrich Hahn 
-	 * @since 0.4x (?)
-	 */	
-	public String toDisplayLine(){
-		StringBuilder res=new StringBuilder(Barcode());
-		if(1<getofParts())
-			res.append(" "+getPartNum()+"/"+getofParts());
-		if(isTainted)
-			res.append(" needs write");
-		return (res.toString());
-	}
-	
 	public LibTag(byte[] userdata) {
 		super(userdata);
 	}
@@ -118,6 +103,18 @@ public class LibTag extends DDMData {
 	public LibTag() {
 		super();
 		addSystemInformation(Util.hexStringToByteArray(SysDummyHex));
+	}
+
+	public LibTag(int currentType) {
+		tagType=currentType;
+		switch(tagType) {
+			case TAG_DDM:	
+				addUserData(Util.hexStringToByteArray(new DDMData().toString()));
+				break;
+			case TAG_DM11:
+				addUserData(Util.hexStringToByteArray(new DM11Data().toString()));
+				break;
+		}
 	}
 
 	

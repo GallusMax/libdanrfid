@@ -38,7 +38,7 @@ public class TagData extends Object {
 	public final static int TAG_UNKNOWN=0;
 	public final static int TAG_DDM=1;
 	public final static int TAG_DM11=2;
-	protected int tagType=TAG_UNKNOWN; // inititlly unknown
+	protected int tagType=TAG_UNKNOWN; // initially unknown
 	
 	DDMData ddmInstance;
 	DM11Data dm11Instance;
@@ -46,6 +46,9 @@ public class TagData extends Object {
 
 	public TagData(int tagHint,byte[] in){
 		tagType = tagHint;
+		if(TAG_UNKNOWN == tagType)
+			createInstances(in);
+
 		addUserData(in);
 	}
 
@@ -54,8 +57,8 @@ public class TagData extends Object {
 	 * @param in - userdata as bytes read from tag
 	 */
 	public TagData(byte[] in){
-//		this(TAG_UNKNOWN,in);
-		initdata(in);
+		this(TAG_UNKNOWN,in);
+//		createInstances(in);
 	}
 
 	public TagData(int tagHint, Byte[] array) {
@@ -80,14 +83,11 @@ public class TagData extends Object {
 		
 	public TagData(int tagHint, String ins) {
 		tagType=tagHint;
-		int startat=0;
-		ins.toLowerCase(); // ignore case
-		if(ins.startsWith("0x")){ // lets believe in HEX
-			startat=2;
-		}
-		String hex=ins.substring(startat); // drop the leading 0x
-		
-		addUserData(Util.hexStringToByteArray(hex));
+		if(TAG_UNKNOWN == tagType)
+			createInstances(Util.hexStringToByteArray(ins));
+
+		addUserData(Util.hexStringToByteArray(ins));
+
 	}
 
 	 /**
@@ -102,9 +102,10 @@ public class TagData extends Object {
 	 * provide an initialized Tag
 	 */
 	public TagData() {
-		super();
-		if(null==userdata32) userdata32 = new char[32];
-		keepshadowdata();
+//		super();
+//		if(null==userdata32) userdata32 = new char[32];
+		createInstances(new byte[32]);
+//		keepshadowdata();
 	}
 
 	/**
@@ -220,22 +221,31 @@ public class TagData extends Object {
 	 * @param in - the byte[] to be set
 	 */
 	public void addUserData(byte[] in) {
-		if(null==userdata32) userdata32 = new char[32];
+		if(null==userdata32) { 
+			userdata32 = new char[32];
+		}
 		for (int i = 0; i < 32; i++) { // dont trust in length ;-) 
 			if(i<in.length) // any case..
 				userdata32[i]=(char)in[i];
 			else
 				userdata32[i]=(char)0; // init all
 		}
-		
-		if(TAG_UNKNOWN == tagType) initdata(in);
-	}
 
+		if(TAG_UNKNOWN == tagType) 
+			createInstances(in);
+	}
 	/**
 	 * getter for the one userdata32 char array
 	 */
 	protected char[] getUserData() {
-		return userdata32;
+		switch (tagType) {
+		case TAG_DDM:
+			return ddmInstance.userdata32;
+		case TAG_DM11:
+			return dm11Instance.userdata32;
+		default:
+			return userdata32;
+		}  	
 	}
 	
 	/**
@@ -256,17 +266,16 @@ public class TagData extends Object {
 	 * instantiate all known tag models ant check which may be valid
 	 * @param in - an unknown byte array as read in
 	 */
-	protected void initdata(byte[] in) {
-		
-		dm11Instance = new DM11Data(in);
-
+	private void createInstances(byte[] in) {
+			dm11Instance = new DM11Data(in);
+			ddmInstance = new DDMData(in);
+	
 		// rely on CRC check of DDM
-		ddmInstance = new DDMData(in);
 			if(ddmInstance.isvalid()) tagType = TAG_DDM;
 			else // if this fails, there is a chance of finding a DM11
 				if(dm11Instance.isvalid()) tagType = TAG_DM11;
-
 	}
+
 
 	/**
 	 * clone userdata32 into char[32] shadowdata
@@ -342,6 +351,58 @@ public class TagData extends Object {
 	}
 
 	/**
+	 * read the CRC as int, added up LSB first, MSB last
+	 * @return
+	 */
+	public int getCRC(){
+		switch (tagType){
+		case TAG_DDM:
+			return ddmInstance.getCRC();
+		}
+		return 0;
+	}
+	
+	public int getofParts() {
+		switch (tagType) {
+		case TAG_DDM:
+			return ddmInstance.getofParts();
+		}
+		return 0;
+	}
+
+	/**
+	 * change the number of parts 
+	 * @param n - the number of parts
+	 */
+	public void setofParts(int n){
+		switch (tagType) {
+		case TAG_DDM:
+			ddmInstance.setofParts(n);
+			break;
+		}
+	}
+	
+	public int getPartNum() {
+		switch (tagType) {
+		case TAG_DDM:
+			return ddmInstance.getPartNum();
+		}
+		return 0;
+	}
+	
+	/**
+	 * change the item number to @param i of ofParts
+	 * @param i 
+	 */
+	public void setPartNum(int i){
+		switch (tagType) {
+		case TAG_DDM:
+			ddmInstance.setPartNum(i);
+			break;
+		}
+	}
+	
+	/**
 	 * @return - the countrycode
 	 * read from Tag, if possible
 	 */
@@ -392,19 +453,6 @@ public class TagData extends Object {
 		}
 
 	}
-
-	/**
-	 * HEX representation of the 32 byte payload of a tag
-	 * with the CRC updated
-	 */
-	public String toString(){
-		String res="";
-		updateCRC(); // the CRC is refreshed automagically before giving away the content
-		for (char d : userdata32) {
-			res=res.concat(String.format("%02x", (byte)d));			
-		}
-		return res;
-	}
 	
 	public int updateCRC() {
 		switch (tagType){
@@ -414,6 +462,20 @@ public class TagData extends Object {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * HEX representation of the 32 byte payload of a tag
+	 * with the CRC updated
+	 */
+	public String toString() {
+		String res="";
+		updateCRC(); // the CRC is refreshed automagically before giving away the content
+//		userdata32 = ddmInstance.userdata32.clone();
+		for (char d : userdata32) {
+			res=res.concat(String.format("%02x", (byte)d));			
+		}
+		return res;
 	}
 	
 

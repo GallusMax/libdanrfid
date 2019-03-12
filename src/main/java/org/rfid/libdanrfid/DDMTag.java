@@ -1,6 +1,21 @@
 /**
+ * This file is part of libdanrfid, a toolkit for RFID Library Tags.
+ * Copyright (C) 2013 Ulrich Hahn
  * 
+ * libdanrfid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * libdanrfid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with libdanrfid. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package org.rfid.libdanrfid;
 
 /**
@@ -14,7 +29,8 @@ public class DDMTag extends LibTag {
 	 */
 	public DDMTag(byte[] userdata) {
 		super(userdata);
-		super.tagType=TAG_DDM;
+		tagType=TAG_DDM;
+//		addUserData(userdata);
 	}
 
 	/**
@@ -22,14 +38,30 @@ public class DDMTag extends LibTag {
 	 */
 	public DDMTag(String hexstring) {
 		super(hexstring);
-		super.tagType=TAG_DDM;
+		tagType=TAG_DDM;
 	}
 
 	/**
-	 * 
+	 * instantiate a dummy DDM tag
 	 */
 	public DDMTag() {
-		super.tagType=TAG_DDM;
+		super(TAG_DDM);
+		tagType=TAG_DDM;
+	}
+	
+	/**
+	 * test purposes: preset with userdata
+	 * @param in - the user data hex string to be set
+	 */
+	public void addUserData(byte[] in) {
+		ddmInstance.addUserData(in);
+	}
+
+	/**
+	 * export the userdata as hex (DDMTag special)
+	 */
+	public String toString() {
+		return ddmInstance.toString();
 	}
 	
 	/**
@@ -57,6 +89,21 @@ public class DDMTag extends LibTag {
 	public static void usage(){
 		System.out.format("usage: $0 <barcode>\n");
 		System.out.format("will return the 32 byte userdata of a RFID Tag\n");
+	}
+
+	/**
+	 * formatted line output for a Panel view. 
+	 * @return formatted String showing the barcode and optional an item count 
+	 * @author Ulrich Hahn 
+	 * @since 0.4x (?)
+	 */
+	public String toDisplayLine() {
+		StringBuilder res=new StringBuilder(Barcode());
+		if(1<getofParts())
+			res.append(" "+getPartNum()+"/"+getofParts());
+		if(isTainted)
+			res.append(" needs write");
+		return (res.toString());
 	}
 
 

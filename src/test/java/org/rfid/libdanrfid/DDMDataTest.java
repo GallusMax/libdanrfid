@@ -6,9 +6,13 @@ import org.junit.Test;
 
 public class DDMDataTest {
 
+	private static final String UserDummyHex="11010131313232333334340000000000000000513e4445373035000000000000";
+	private static final String UserEmptyHex="11010100000000000000000000000000000000ca9f4445373035000000000000";
+	
 	@Test
 	public void testDDMDataString() {
 		assertNotNull(new DDMData("11010131313232333334340000000000000000513e4445373035000000000000").toString()); // just simple
+		assertEquals(UserEmptyHex, new DDMData().toString());
 	}
 
 	@Test
@@ -36,7 +40,7 @@ public class DDMDataTest {
 	@Test
 	public void testtagCRC() {
 		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000");
-//		assertNotNull(data.toString()); //sets CRC
+		assertNotNull(data.toString()); //sets CRC
 		assertEquals(data.getCRC(),new CRC().tagCRC(data.userdata32,19));
 		
 	}

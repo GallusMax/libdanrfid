@@ -75,7 +75,7 @@ public class DDMData extends TagData{
 			return;
 		}
 		
-		DDMData td=new DDMData();
+		TagData td=new DDMData();
 		td.setBarcode(args[0]);
 		System.out.format("%s", td.toString());
 		
@@ -117,7 +117,9 @@ public class DDMData extends TagData{
 	 * - County and ISIL initialized with default values (hard coded)
 	 */
 	public DDMData(){
-		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
+//		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
+		addUserData(new byte[32]);
+		keepshadowdata();
 		setUsage(V1AUSLEIHBAR);
 		setofParts(1);
 		setPartNum(1);
