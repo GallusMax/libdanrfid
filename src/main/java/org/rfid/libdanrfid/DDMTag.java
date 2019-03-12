@@ -15,7 +15,6 @@ public class DDMTag extends LibTag {
 	public DDMTag(byte[] userdata) {
 		super(userdata);
 		super.tagType=TAG_DDM;
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -23,14 +22,14 @@ public class DDMTag extends LibTag {
 	 */
 	public DDMTag(String hexstring) {
 		super(hexstring);
-		// TODO Auto-generated constructor stub
+		super.tagType=TAG_DDM;
 	}
 
 	/**
 	 * 
 	 */
 	public DDMTag() {
-		// TODO Auto-generated constructor stub
+		super.tagType=TAG_DDM;
 	}
 	
 	/**
