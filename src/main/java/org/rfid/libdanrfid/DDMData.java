@@ -540,10 +540,10 @@ public class DDMData extends Object{
 	}
 	/**
 	 * fill in the ISIL
-	 * @param iso
+	 * @param isil
 	 */
-	public void setISIL(String s){
-		setStringAt(s, 23, 9);
+	public void setISIL(String isil){
+		setStringAt(isil, 23, 9);
 	}
 	
 	/**
