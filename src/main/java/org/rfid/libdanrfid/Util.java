@@ -18,17 +18,26 @@ public class Util {
     
 	/**
 	 * interpret a string of hex numbers as bytes
-	 * TODO: error checking, leading 0x to be skipped?
+	 * leading 0x will be skipped?
 	 * @param s - the string of hex digit pairs
 	 * @return - an array of bytes
 	 */
     public static byte[] hexStringToByteArray(String s) {
     	//TODO what if null==s?
-    	int len = s.length();
+//    	if(null == s) return null;
+		int startat=0;
+		s.toLowerCase(); // ignore case
+		if(s.startsWith("0x")){ // lets believe in HEX
+			startat=2;
+		}
+	
+		String hex=s.substring(startat); // drop the leading 0x
+
+    	int len = hex.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                                 + Character.digit(s.charAt(i+1), 16));
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                                 + Character.digit(hex.charAt(i+1), 16));
         }
         return data;
     }
