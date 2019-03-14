@@ -471,7 +471,8 @@ public class TagData extends Object {
 	public String toString() {
 		String res="";
 		updateCRC(); // the CRC is refreshed automagically before giving away the content
-//		userdata32 = ddmInstance.userdata32.clone();
+		if(null == userdata32)
+			userdata32 = ddmInstance.userdata32;
 		for (char d : userdata32) {
 			res=res.concat(String.format("%02x", (byte)d));			
 		}

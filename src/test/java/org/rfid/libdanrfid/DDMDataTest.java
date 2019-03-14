@@ -11,7 +11,7 @@ public class DDMDataTest {
 	
 	@Test
 	public void testDDMDataString() {
-		assertNotNull(new DDMData("11010131313232333334340000000000000000513e4445373035000000000000").toString()); // just simple
+		assertEquals(UserDummyHex, new DDMData(UserDummyHex).toString()); // just simple
 		assertEquals(UserEmptyHex, new DDMData().toString());
 	}
 
@@ -26,20 +26,20 @@ public class DDMDataTest {
 
 	@Test
 	public void testCompareCRC() {
-		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+		DDMData data = new DDMData(UserDummyHex); // just simple
 		assertTrue(data.compareCRC());
 	}
 	
 	@Test
 	public void testGetCRC() {
-			DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
+			DDMData data = new DDMData(UserDummyHex); // just simple
 //		assertNotNull(data.toString()); // CRC is OK on test data
 		assertEquals((int)0x3e51, data.getCRC());
 	}
 
 	@Test
 	public void testtagCRC() {
-		DDMData data = new DDMData("11010131313232333334340000000000000000513e4445373035000000000000");
+		DDMData data = new DDMData(UserDummyHex);
 		assertNotNull(data.toString()); //sets CRC
 		assertEquals(data.getCRC(),new CRC().tagCRC(data.userdata32,19));
 		
