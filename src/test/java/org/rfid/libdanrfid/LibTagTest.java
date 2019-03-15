@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +12,8 @@ public class LibTagTest {
 
 	private static final String UserDummyHex="11010131313232333334340000000000000000513e4445373035000000000000";
 	private static final String UserEmptyHex="11010100000000000000000000000000000000ca9f4445373035000000000000";
-	
+	private static final String UserNullHex="000000000000000000000000000000000000004cf10000000000000000000000";
+
 	// test values without blocksize/memsize info!
 	private static final String SysDummyHex="0355443322110004E00007";
 	private static final String SysDummyUnlockHex="0355443322110004E00021";
@@ -21,7 +23,9 @@ public class LibTagTest {
 		LibTag data = new LibTag();
 		assertEquals(TagData.TAG_UNKNOWN, data.tagType);
 		assertNotNull(data.toString()); // just simple
-		assertEquals(UserEmptyHex, new LibTag().toString());
+		assertNotEquals(UserEmptyHex, data.toString());
+		data.tagType=TagData.TAG_DDM;
+		assertEquals(UserNullHex, data.toString());
 	}
 
 	@Test
