@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LibTagTest {
 
-	private static final String UserDummyHex="11010131313232333334340000000000000000513e4445373035000000000000";
+	private static final String UserDefaultHex ="11010131313232333334340000000000000000513e4445373035000000000000";
 	private static final String UserEmptyHex="11010100000000000000000000000000000000ca9f4445373035000000000000";
 	private static final String UserNullHex="000000000000000000000000000000000000004cf10000000000000000000000";
 
@@ -30,8 +30,8 @@ public class LibTagTest {
 
 	@Test
 	public void testFromString() {
-		LibTag data = new LibTag(UserDummyHex);
-		assertEquals(UserDummyHex, data.toString());
+		LibTag data = new LibTag(UserDefaultHex);
+		assertEquals(UserDefaultHex, data.toString());
 	}
 
 	@Test
@@ -53,6 +53,30 @@ public class LibTagTest {
 		LibTag tag = new LibTag("11010131313232333334340000000000000000513e4445373035000000000000"); // just simple
 		String tbarcode = tag.Barcode();
 		assertEquals("11223344",tbarcode);
+	}
+	@Test
+	public void testBuildDDMFields() {
+		LibTag data = new LibTag();
+		//	keepshadowdata();
+		data.tagType = LibTag.TAG_DDM;
+		data.setUsage(DDMData.V1AUSLEIHBAR);
+		data.setofParts(1);
+		data.setPartNum(1);
+		data.setCountry("DE");
+		data.setISIL("705");
+		data.setBarcode("11223344");
+		assertEquals(UserDefaultHex,data.toString());
+	}
+
+	@Test
+	public void testBuildDM11Fields() {
+		LibTag data = new LibTag();
+		data.tagType = LibTag.TAG_DM11;
+		data.setCountry("DE");
+		data.setISIL("705");
+		data.setBarcode("12345678");
+		// will work after CRC + init tweaking
+		//assertEquals(DM11Data.UserDefaultHex,data.toString());
 	}
 
 	@Test

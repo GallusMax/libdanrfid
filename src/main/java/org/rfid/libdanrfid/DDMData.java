@@ -55,6 +55,8 @@ public class DDMData extends TagData{
 	public static final char BIBLIOTHECA_GELOESCHT=0x71;
 	public final static String[] TypeName = {"Neuerwerbung","Ausleihbar","Präsenz","local 0x13","local 0x14","future 0x15","Unbekannt","Gelöscht","Kundenkarte","Gerät"};
 
+	private static final String UserDefaultHex ="11010131313232333334340000000000000000513e4445373035000000000000";
+
 //	public final static Hash<char,String> HStatus=new Hash<char,String>{};
 	
 	/**

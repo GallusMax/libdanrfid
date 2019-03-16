@@ -148,7 +148,7 @@ public class TagData extends Object {
 
 	/**
 	 * find out if our updates have changed block n
-	 * @param n
+	 * @param n block index
 	 * @return true if block needs to be written back to tag
 	 */
 	public boolean blocktainted(int n) {
@@ -157,7 +157,7 @@ public class TagData extends Object {
 
 	/**
 	 * find out if our updates have changed block n
-	 * @param n
+	 * @param n block index
 	 * @param blocksize
 	 * @return true if block needs to be written back to tag
 	 */
@@ -401,7 +401,19 @@ public class TagData extends Object {
 			break;
 		}
 	}
-	
+
+	public void setUsage(char newusage) {
+		switch (tagType) {
+			case TAG_DDM:
+				ddmInstance.setUsage(newusage);
+				break;
+		}
+	}
+
+	public int getUsage() {
+		return ddmInstance.getUsage();
+	}
+
 	/**
 	 * @return - the countrycode
 	 * read from Tag, if possible
@@ -472,12 +484,19 @@ public class TagData extends Object {
 		String res="";
 		updateCRC(); // the CRC is refreshed automagically before giving away the content
 		if(null == userdata32)
-			userdata32 = ddmInstance.userdata32;
+			switch(tagType) {
+			case TAG_DM11:
+				userdata32 = dm11Instance.userdata32;
+				break;
+				default:
+					userdata32 = ddmInstance.userdata32;
+		}
+
 		for (char d : userdata32) {
 			res=res.concat(String.format("%02x", (byte)d));			
 		}
 		return res;
 	}
-	
+
 
 }

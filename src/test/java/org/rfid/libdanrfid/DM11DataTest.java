@@ -83,6 +83,23 @@ public class DM11DataTest {
 		testcode= new String("abcd1234");
 		data.setBarcode(testcode);
 		assertEquals(testcode, data.Barcode());
+
+		data.setBarcode("12345678");
+		assertEquals("12345678",data.Barcode());
+		// should be equal - after tweaking the generation + CRC
+//		assertEquals(DM11Data.UserDefaultHex,data.toString());
+	}
+
+	@Test
+	public void testTwinUserdata(){
+		// created Userdata - strange: same Barcode() result?
+		DM11Data data = new DM11Data("0040200c44611c08000000000000000000000000000000000000000000000000");
+		assertEquals("12345678",data.Barcode());
+
+		// sample Userdata
+		data = new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
+		assertEquals("12345678",data.Barcode());
+
 	}
 
 }

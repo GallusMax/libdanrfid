@@ -29,6 +29,8 @@ public class DM11Data extends TagData{
 	private final int[] byteorder = {2,1,3,5,4,6,7};  // order of relevant bytes on chip
 	private final int[] presorder = {1,0,3,6,5,4,7,8};  // presentation order of 3-tuples
 
+	public static final String UserDefaultHex="0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555";
+
 	/**
 	 * @param args
 	 * usage: $0 <barcode> [more args?]
