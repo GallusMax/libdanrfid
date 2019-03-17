@@ -19,7 +19,7 @@ $Id: $
 package org.rfid.libdanrfid;
 
 public class CRC {
-	final int crc_poly=0x1021;
+	int crc_poly=0x1021;
 	int crc_sum=0xffff;
 	
 	static final String referenceString="RFID tag data model";
@@ -50,7 +50,11 @@ public class CRC {
 	
 	public CRC(){		
 	}
-	
+
+	public CRC(int poly){
+		crc_poly=poly;
+	}
+
 	public CRC(char[] ba) {
 		computeCRC(ba);
 	}

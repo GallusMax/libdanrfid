@@ -84,21 +84,37 @@ public class DM11DataTest {
 		data.setBarcode(testcode);
 		assertEquals(testcode, data.Barcode());
 
+		DDMData dd = new DDMData();
+//		assertEquals("test",dd.toString());
+		assertEquals(0x9fca,new CRC(0x1021).tagCRC(dd.userdata32,19));
+
+		data = new DM11Data();
 		data.setBarcode("12345678");
 		assertEquals("12345678",data.Barcode());
 		// should be equal - after tweaking the generation + CRC
+//		assertEquals(DM11Data.UserDefaultHex,data.toString());
+//		assertEquals(0x4cbb,new CRC(0x8005).tagCRC(data.userdata32,14));
+//		assertEquals(0x4cbb,new CRC(0x1DCF).tagCRC(data.userdata32,14));
 //		assertEquals(DM11Data.UserDefaultHex,data.toString());
 	}
 
 	@Test
 	public void testTwinUserdata(){
 		// created Userdata - strange: same Barcode() result?
-		DM11Data data = new DM11Data("0040200c44611c08000000000000000000000000000000000000000000000000");
+		DM11Data data;
+		data = new DM11Data("0040200c44611c08000000000000000000000000000000000000000000000000");
+		data = new DM11Data("0B41244d54655d18000000000000000000000000000000000000000000000000");
+		assertEquals(TagData.TAG_DM11,data.tagType);
 		assertEquals("12345678",data.Barcode());
 
 		// sample Userdata
-		data = new DM11Data("0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555");
-		assertEquals("12345678",data.Barcode());
+		data = new DM11Data("0B41155DD9945113944100000000FD32A484FF4F42504401500400000000F555");
+		assertEquals(TagData.TAG_DM11,data.tagType);
+		assertEquals("51793943",data.Barcode());
+
+		data = new DM11Data("0B41054D107655189441000000004B9FA484FF4F42504401500400000000F555");
+		assertEquals(TagData.TAG_DM11,data.tagType);
+		assertEquals("50308758",data.Barcode());
 
 	}
 

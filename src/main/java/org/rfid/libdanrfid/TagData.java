@@ -471,6 +471,7 @@ public class TagData extends Object {
 			case TAG_DDM:
 				return ddmInstance.updateCRC();
 
+
 		}
 
 		return 0;

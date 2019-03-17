@@ -29,8 +29,8 @@ public class DM11Data extends TagData{
 	private final int[] byteorder = {2,1,3,5,4,6,7};  // order of relevant bytes on chip
 	private final int[] presorder = {1,0,3,6,5,4,7,8};  // presentation order of 3-tuples
 
-	public static final String UserDefaultHex="0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555";
-
+	public static final String UserDefaultHex="0B41244D54655D18000000000000BB4CA484FF4F42504401500400000000F555".toLowerCase();
+	public static final String UserNullHex="0B01044110044110000000000000B96DA484FF4F42504401500400000000F555".toLowerCase();
 	/**
 	 * @param args
 	 * usage: $0 <barcode> [more args?]
@@ -43,11 +43,15 @@ public class DM11Data extends TagData{
 			usage();
 			return;
 		}
-		
+
 		DM11Data td=new DM11Data();
 		td.setBarcode(args[0]);
-		System.out.format("%s", td.toString());
-		
+		System.out.format("%s\n", td.toString());
+
+//		String UserDefaultMinusCK="0B41244D54655D18000000000000A484FF4F42504401500400000000F5550000";
+//		for(int i=13;i<=32;i++)
+//		System.out.format("%04x\n",td.Modsum(Util.hexStringToByteArray(UserDefaultMinusCK),i));
+
 	}
 	
 	public static void usage(){
@@ -88,7 +92,8 @@ public class DM11Data extends TagData{
 	 */
 	public DM11Data(){
 //		shadowdata=userdata32.clone(); // keep empty shadow in order to mark all blocks tainted
-		addUserData(new byte[32]);
+//		addUserData(new byte[32]);
+		addUserData(Util.hexStringToByteArray(UserNullHex));
 		keepshadowdata();
 		setCountry(myCountry);
 		setISIL(myISIL);		
@@ -212,7 +217,7 @@ public class DM11Data extends TagData{
 	public String Barcode(){
 		String res=new String("........");
 		char[] build = res.toCharArray();
-		
+
 		build[0]=Integer.toHexString(this.HL2num(this.Lnibble(2),this.Hnibble(1))).charAt(0);
 		build[1]=Integer.toHexString(this.Hnibble(2)).charAt(0);
 		build[2]=Integer.toHexString(this.HL2num(this.Hnibble(3),this.Lnibble(3))).charAt(0);
@@ -256,6 +261,43 @@ public class DM11Data extends TagData{
 	public int updateCRC() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+
+	public int Fletcher16( byte[] data, int count )
+	{
+		int sum1 = 0;
+		int sum2 = 0;
+		int index;
+
+		for( index = 0; index < count; ++index )
+		{
+			sum1 = (sum1 + data[index]) % 255;
+			sum2 = (sum2 + sum1) % 255;
+
+//			System.out.format("%04x\n",(sum2 << 8)|sum1);
+		}
+
+		int csum = ((sum2 << 8) | sum1);
+
+		int f0 = csum & 0xff;
+		int f1 = (csum >> 8) & 0xff;
+		int c0 = 0xff - (( f0 + f1) % 0xff);
+		int c1 = 0xff - (( f0 + c0 ) % 0xff);
+
+		return ((c0 << 8)|c1);
+	}
+
+	public int Modsum(byte[] data, int count){
+		int sum=0;
+
+		for(int i=0;i<count;i++){
+			sum += data[i];
+			sum = sum % 0xffff;
+		}
+		return sum;
+		//return 0x10000 - sum;
+
 	}
 
 
