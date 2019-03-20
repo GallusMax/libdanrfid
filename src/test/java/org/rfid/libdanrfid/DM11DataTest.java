@@ -84,7 +84,7 @@ public class DM11DataTest {
 		data.setBarcode(testcode);
 		assertEquals(testcode, data.Barcode());
 
-		DDMData dd = new DDMData();
+		TagData dd = new DDMData();
 //		assertEquals("test",dd.toString());
 		assertEquals(0x9fca,new CRC(0x1021).tagCRC(dd.userdata32,19));
 
@@ -117,5 +117,14 @@ public class DM11DataTest {
 		assertEquals("50308758",data.Barcode());
 
 	}
+	
+	@Test
+	public void testgetVersionUsage() {
+		TagData data;
+		data = new DM11Data();
+		assertEquals(0x0b, data.getVersionByte());
+		
+	}
+			
 
 }

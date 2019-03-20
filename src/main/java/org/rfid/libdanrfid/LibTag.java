@@ -118,4 +118,15 @@ public class LibTag extends TagData {
 	}
 
 	
+	/**
+	 * formatted line output for a Panel view. to be overridden
+	 * @return formatted String showing the barcode and optional an item count 
+	 * @author Ulrich Hahn 
+	 * @since 0.4x (?)
+	 */
+	public String toDisplayLine() {
+		return "should be overridden";
+	}
+
+	
 }

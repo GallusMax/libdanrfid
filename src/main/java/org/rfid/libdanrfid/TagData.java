@@ -38,9 +38,9 @@ public class TagData extends Object {
 	public final static int TAG_UNKNOWN=0;
 	public final static int TAG_DDM=1;
 	public final static int TAG_DM11=2;
-	protected int tagType=TAG_UNKNOWN; // initially unknown
+	public int tagType=TAG_UNKNOWN; // initially unknown
 	
-	DDMData ddmInstance;
+	TagData ddmInstance;
 	DM11Data dm11Instance;
 
 
@@ -413,6 +413,10 @@ public class TagData extends Object {
 	public int getUsage() {
 		return ddmInstance.getUsage();
 	}
+	
+	public String getUsageAsString() {
+		return "dummz"; //TODO implement
+	}
 
 	/**
 	 * @return - the countrycode
@@ -497,6 +501,20 @@ public class TagData extends Object {
 			res=res.concat(String.format("%02x", (byte)d));			
 		}
 		return res;
+	}
+
+	public byte getVersionByte() {
+		return (byte)(userdata32[0]&0xff);
+	}
+
+	/**
+	 * 
+	 * @return the raw byte containing 
+	 * a) nibble VERSION
+	 * b) nibble Tag Usage Code
+	 */
+	public char getcharVersion() {
+		return userdata32[0];
 	}
 
 

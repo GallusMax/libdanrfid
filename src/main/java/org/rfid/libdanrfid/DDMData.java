@@ -243,18 +243,6 @@ public class DDMData extends TagData{
 		}
 		return res;
 	}
-	/**
-	 * 
-	 * @return the raw byte containing 
-	 * a) nibble VERSION
-	 * b) nibble Tag Usage Code
-	 */
-	public char getcharVersionUsage(){
-		return userdata32[0];
-	}
-	public byte getVersionUsage(){
-		return (byte)(userdata32[0]&0xff);
-	}
 	
 	@Override
 	public String Barcode(){

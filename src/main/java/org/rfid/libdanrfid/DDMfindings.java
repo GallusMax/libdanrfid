@@ -153,7 +153,7 @@ public class DDMfindings {
 	
 	private double checkType(){
 		double v=1;
-		switch (ddd.getcharVersionUsage()){ // TODO - why not with static?
+		switch (ddd.getcharVersion()){ // TODO - why not with static?
 				case DDMData.V1AUSLEIHBAR: break;
 				case DDMData.V1GELOESCHT: break;
 				case DDMData.V1KUNDE: break;
@@ -161,7 +161,7 @@ public class DDMfindings {
 				case DDMData.V1PRAESENZ: break;
 				case DDMData.BIBLIOTHECA_PRAESENZ: report.add("PRAESENZ Byte (Bibliotheca?)");
 				case DDMData.BIBLIOTHECA_GELOESCHT: report.add("GELOESCHT Byte (Bibliotheca?)");
-				default: report.add(String.format("Typfeld unbekannt: 0x%h",ddd.getcharVersionUsage()));
+				default: report.add(String.format("Typfeld unbekannt: 0x%h",ddd.getcharVersion()));
 						v=0.5;
 		}
 		return v;
