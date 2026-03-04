@@ -38,7 +38,7 @@ jobs:
         # IDs of the artifacts to download, comma-separated. Either inputs `artifact-ids` or `name` can be used, but not both.
         artifact-ids: # optional
         # Destination path. Supports basic tilde expansion. Defaults to $GITHUB_WORKSPACE
-        path: artifact-jars # optional
+        path: target # optional
         # A glob pattern matching the artifacts that should be downloaded. Ignored if name is specified.
         pattern: # optional
         # When multiple artifacts are matched, this changes the behavior of the destination directories. If true, the downloaded artifacts will be in the same directory specified by path. If false, the downloaded artifacts will be extracted into individual named directories within the specified path.
