@@ -3,4 +3,4 @@
 build.gradle
 *.iml
 /bin/
-/.dea/
+/.idea/
